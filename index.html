@@ -12,7 +12,7 @@
   <link rel="icon" href="./favicon.ico">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <link rel="apple-touch-icon" href="./icon-192.png">
-<title>Hawaii 2026 여행 앱 v15.2 Ultimate</title>
+<title>Hawaii 2026 여행 앱 v15.3 Ultimate</title>
 <style>
 :root {
  --bg:#f4f7f8;--card:#fff;--text:#17323a;--muted:#697a80;
@@ -210,12 +210,40 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
 .countdown-normal{color:#0a8791!important}
 @media(max-width:640px){.dual-clock-grid{grid-template-columns:1fr 1fr}.dual-clock-grid .card{padding:14px}}
 
+
+.time-zone-card{overflow:hidden}
+.live-badge{font-size:12px;font-weight:950;color:#159764;background:#eaf9f1;padding:7px 10px;border-radius:999px}
+.dual-time-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.time-zone-box{border:1px solid var(--line);border-radius:18px;padding:16px;background:linear-gradient(145deg,#fff,#f7fbfb)}
+.hawaii-time-box{border-color:#bfe6e3;background:linear-gradient(145deg,#f2fcfb,#fff)}
+.korea-time-box{border-color:#d8e3f1;background:linear-gradient(145deg,#f5f8ff,#fff)}
+.time-zone-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.time-zone-label{font-size:15px;font-weight:950}.time-zone-name{font-size:11px;color:var(--muted);margin-top:3px}
+.zone-pill{background:#e6f8f6;color:var(--brand);font-size:11px;font-weight:900;padding:5px 8px;border-radius:999px}
+.korea-time-box .zone-pill{background:#edf3ff;color:#315c9b}
+.zone-clock{font-size:34px;font-weight:950;letter-spacing:-1px;margin:14px 0 3px;font-variant-numeric:tabular-nums}
+.zone-date{font-size:13px;color:var(--muted)}
+.time-difference{margin-top:10px;padding:9px 12px;background:#f3f7f8;border-radius:12px;color:#52666c;font-size:13px;font-weight:800;text-align:center}
+.schedule-card-head,.next-box-title-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.schedule-card-head h2{margin:3px 0 0}
+.schedule-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.schedule-summary-box{border:1px solid var(--line);border-radius:17px;padding:15px;background:#fbfdfd;min-height:138px}
+.schedule-summary-box small{display:block;color:var(--muted);font-weight:850;margin-bottom:7px}
+.schedule-summary-box b{display:block;font-size:26px;line-height:1.12;color:var(--text);font-variant-numeric:tabular-nums}
+.summary-place{font-size:15px;color:#52666c;margin-top:7px}.schedule-zone-label,.countdown-date{font-size:12px;color:var(--muted);margin-top:7px}
+.countdown-hint{font-size:12px;margin-top:7px;color:#74898f}
+.countdown-box.normal{border-color:#bfe6e3;background:#f2fcfb}.countdown-box.soon{border-color:#ffd99a;background:#fff9eb}.countdown-box.urgent{border-color:#ffb9b3;background:#fff1ef}
+.countdown-box.soon b{color:#c47400}.countdown-box.urgent b{color:#c43b32}
+.status-badge{font-size:11px;font-weight:950;padding:6px 9px;border-radius:999px;background:#e9f7f6;color:var(--brand)}
+.status-badge.soon{background:#fff1d6;color:#a75d00}.status-badge.urgent{background:#ffe1de;color:#b42318}.status-badge.done{background:#edf1f2;color:#63767b}
+@media(max-width:640px){.dual-time-grid,.schedule-summary-grid{grid-template-columns:1fr}.zone-clock{font-size:31px}.schedule-summary-box{min-height:auto}}
+
 </style>
 <script src="./config.js"></script>
 </head>
 <body>
 <input class="day-radio" type="radio" name="day" id="day0" checked><input class="day-radio" type="radio" name="day" id="day1"><input class="day-radio" type="radio" name="day" id="day2"><input class="day-radio" type="radio" name="day" id="day3"><input class="day-radio" type="radio" name="day" id="day4"><input class="day-radio" type="radio" name="day" id="day5"><input class="day-radio" type="radio" name="day" id="day6"><input class="day-radio" type="radio" name="day" id="day7"><input class="day-radio" type="radio" name="day" id="day8">
-<div class="app"><div class="version-banner">✅ Hawaii App v15.2 Ultimate · AI 여행 비서 · GPT 통역 적용됨</div>
+<div class="app"><div class="version-banner">✅ Hawaii App v15.3 Ultimate · AI 여행 비서 · GPT 통역 적용됨</div>
 <header class="hero">
   <div class="eyebrow">MY OAHU TRIP</div>
   <h1>🌺 Hawaii 2026</h1>
@@ -229,44 +257,65 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
 <main>
 
 <section id="homePage" class="page active">
-  <section class="card">
-    <div class="row">
-      <div>
-        <div class="note">하와이 현지 시각</div>
-        <h2 id="hawaiiClock" style="font-size:30px;margin:2px 0 0">--:--</h2>
-        <div id="hawaiiDate" class="note">날짜 확인 중</div>
+  
+<section class="card time-zone-card">
+  <div class="section-title">
+    <div><h2>세계 시각</h2><small>하와이와 한국 시간을 동시에 표시합니다.</small></div>
+    <span class="live-badge">● LIVE</span>
+  </div>
+  <div class="dual-time-grid">
+    <div class="time-zone-box hawaii-time-box">
+      <div class="time-zone-head">
+        <div><div class="time-zone-label">🌺 하와이 현지 시각</div><div class="time-zone-name">Pacific/Honolulu · HST</div></div>
+        <span class="zone-pill">Honolulu</span>
       </div>
-<div class="card">
-  <div class="muted">한국 현재 시각</div>
-  <div id="koreaClock" style="font-size:38px;font-weight:950;letter-spacing:-1px">--:--</div>
-  <div id="koreaDate" class="muted">--</div>
-  <span class="pill">Seoul</span>
-</div>
-      <span class="pill">Honolulu</span>
+      <div id="hawaiiClock" class="zone-clock">--:--:--</div>
+      <div id="hawaiiDate" class="zone-date">날짜 확인 중</div>
     </div>
-  </section>
+    <div class="time-zone-box korea-time-box">
+      <div class="time-zone-head">
+        <div><div class="time-zone-label">🇰🇷 한국 현재 시각</div><div class="time-zone-name">Asia/Seoul · KST</div></div>
+        <span class="zone-pill">Seoul</span>
+      </div>
+      <div id="koreaClock" class="zone-clock">--:--:--</div>
+      <div id="koreaDate" class="zone-date">날짜 확인 중</div>
+    </div>
+  </div>
+  <div class="time-difference">한국이 하와이보다 19시간 빠릅니다.</div>
+</section>
 
-  <section class="card">
-    <div class="row">
-      <div>
-        <div class="note">현재 선택 일정</div>
-        <h2 id="homeSelectedDay" style="margin:2px 0 0">9월 4일</h2>
-      </div>
-      <button id="goScheduleBtn" class="btn secondary" type="button">전체 일정</button>
+  
+<section class="card next-schedule-card">
+  <div class="schedule-card-head">
+    <div><div class="note">현재 선택 일정</div><h2 id="homeSelectedDay">9월 4일 (금)</h2></div>
+    <button id="goScheduleBtn" class="btn secondary" type="button">전체 일정</button>
+  </div>
+  <div class="schedule-summary-grid">
+    <div class="schedule-summary-box">
+      <small>다음 일정</small>
+      <b id="nextTime">--</b>
+      <div id="nextPlace" class="summary-place">확인 중</div>
+      <div id="nextTimeZone" class="schedule-zone-label">시간대 확인 중</div>
     </div>
-    <div class="home-kpis" style="margin-top:12px">
-      <div class="home-kpi"><small>다음 일정</small><b id="nextTime">--</b><div id="nextPlace" class="note">확인 중</div></div>
-      <div class="home-kpi"><small>남은 시간</small><b id="countdownText">--</b><div class="note">30분 이내 강조</div></div>
+    <div id="countdownBox" class="schedule-summary-box countdown-box">
+      <small>남은 시간</small>
+      <b id="countdownText">--</b>
+      <div id="nextEventDateTime" class="countdown-date">일정 날짜 확인 중</div>
+      <div class="countdown-hint">일정 날짜와 시간을 기준으로 계산합니다.</div>
     </div>
-    <div class="next-box">
-      <h3 id="nextActionTitle">다음 목적지</h3>
-      <div id="nextActionNote" class="note"></div>
-      <div class="inline-actions">
-        <a id="nextGoogle" class="btn secondary">Google 지도</a>
-        <a id="nextApple" class="btn ghost">Apple 지도</a>
-      </div>
+  </div>
+  <div class="next-box">
+    <div class="next-box-title-row">
+      <div><div class="note">다음 목적지</div><h3 id="nextActionTitle">확인 중</h3></div>
+      <span id="countdownBadge" class="status-badge">예정</span>
     </div>
-  </section>
+    <div id="nextActionNote" class="note"></div>
+    <div class="inline-actions">
+      <a id="nextGoogle" class="btn secondary" target="_blank" rel="noopener">Google 지도</a>
+      <a id="nextApple" class="btn ghost" target="_blank" rel="noopener">Apple 지도</a>
+    </div>
+  </div>
+</section>
 
   <section class="card">
     <div class="row"><h2>날씨 · 일몰</h2><span class="pill">빠른 검색</span></div>
@@ -1659,7 +1708,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
   <button data-page="explore"><span>🌴</span>탐색</button>
   <button data-page="check"><span>✅</span>준비물</button>
 </nav>
-<div class="footer">Hawaii Travel App v15.2 Ultimate · AI 여행 비서 · GPT 통역</div>
+<div class="footer">Hawaii Travel App v15.3 Ultimate · AI 여행 비서 · GPT 통역</div>
 </div>
 
 <script>
@@ -1811,48 +1860,114 @@ function honoluluNow(){
 }
 
 function updateHomeDashboard(){
-  const hw=honoluluNow();
-  const clock=document.getElementById('hawaiiClock');
-  if(clock) clock.textContent=hw.text;
-  const date=document.getElementById('hawaiiDate');
-  if(date) date.textContent=`하와이 현지 날짜 ${hw.date}`;
+  const HAWAII_TZ='Pacific/Honolulu';
+  const KOREA_TZ='Asia/Seoul';
+  const now=new Date();
+
+  const clockFormat=(tz)=>new Intl.DateTimeFormat('ko-KR',{
+    timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
+  }).format(now);
+  const dateFormat=(tz)=>new Intl.DateTimeFormat('ko-KR',{
+    timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'
+  }).format(now);
+
+  const hwClock=document.getElementById('hawaiiClock');
+  const hwDate=document.getElementById('hawaiiDate');
+  const krClock=document.getElementById('koreaClock');
+  const krDate=document.getElementById('koreaDate');
+  if(hwClock) hwClock.textContent=clockFormat(HAWAII_TZ);
+  if(hwDate) hwDate.textContent=dateFormat(HAWAII_TZ);
+  if(krClock) krClock.textContent=clockFormat(KOREA_TZ);
+  if(krDate) krDate.textContent=dateFormat(KOREA_TZ);
 
   const dayIndex=getSelectedDayIndex();
-  const selectedLabel=travelDates[dayIndex]?.label||'선택 일정';
+  const selected=travelDates[dayIndex]||travelDates[0];
   const selectedDayEl=document.getElementById('homeSelectedDay');
-  if(selectedDayEl) selectedDayEl.textContent=selectedLabel;
+  if(selectedDayEl) selectedDayEl.textContent=selected.label;
 
-  const items=getPanelItems(dayIndex);
-  if(!items.length) return;
+  const panel=document.querySelector('.panel-'+dayIndex);
+  if(!panel) return;
+  const articles=[...panel.querySelectorAll('.item')];
+  if(!articles.length) return;
 
-  const nowMin=hw.hours*60+hw.minutes;
-  let chosen=items.find(x=>{
-    const t=parseStartMinutes(x.time);
-    return t!==null && t>=nowMin;
-  });
-  if(!chosen) chosen=items[0];
+  function firstTime(text){
+    const m=String(text||'').match(/(\d{1,2}):(\d{2})/);
+    return m ? {hour:Number(m[1]),minute:Number(m[2])} : null;
+  }
 
-  const t=parseStartMinutes(chosen.time);
+  function eventInfo(article,itemIndex){
+    const timeText=article.querySelector('.time')?.textContent.trim()||'';
+    const place=article.querySelector('.place')?.textContent.trim()||'';
+    const note=article.querySelector('.note')?.textContent.trim()||'';
+    const map=article.querySelector('a[href]')?.href||'#';
+    const tm=firstTime(timeText);
+    if(!tm) return null;
+
+    const day=4+dayIndex;
+    const isKorea=(dayIndex===0 && itemIndex<=1) || /인천/.test(place);
+    const zone=isKorea ? 'Asia/Seoul' : 'Pacific/Honolulu';
+    const zoneLabel=isKorea ? '한국시간(KST)' : '하와이시간(HST)';
+    const utcHour=isKorea ? tm.hour-9 : tm.hour+10;
+    const instant=new Date(Date.UTC(2026,8,day,utcHour,tm.minute,0));
+
+    return {timeText,place,note,map,instant,zone,zoneLabel};
+  }
+
+  const events=articles.map(eventInfo).filter(Boolean).sort((a,b)=>a.instant-b.instant);
+  const chosen=events.find(e=>e.instant>now);
+
   const nextTime=document.getElementById('nextTime');
   const nextPlace=document.getElementById('nextPlace');
+  const nextZone=document.getElementById('nextTimeZone');
   const countdown=document.getElementById('countdownText');
+  const countdownDate=document.getElementById('nextEventDateTime');
+  const countdownBox=document.getElementById('countdownBox');
+  const badge=document.getElementById('countdownBadge');
   const nextTitle=document.getElementById('nextActionTitle');
   const nextNote=document.getElementById('nextActionNote');
   const g=document.getElementById('nextGoogle');
   const a=document.getElementById('nextApple');
 
-  if(nextTime) nextTime.textContent=chosen.time;
+  if(!chosen){
+    if(nextTime) nextTime.textContent='일정 완료';
+    if(nextPlace) nextPlace.textContent='선택한 날짜의 일정이 모두 지났습니다.';
+    if(nextZone) nextZone.textContent='';
+    if(countdown) countdown.textContent='완료';
+    if(countdownDate) countdownDate.textContent=selected.label;
+    if(nextTitle) nextTitle.textContent='선택한 날짜 일정 완료';
+    if(nextNote) nextNote.textContent='전체 일정에서 다른 날짜를 선택해 주세요.';
+    if(countdownBox) countdownBox.className='schedule-summary-box countdown-box';
+    if(badge){badge.textContent='완료';badge.className='status-badge done';}
+    return;
+  }
+
+  const totalMinutes=Math.max(0,Math.floor((chosen.instant-now)/60000));
+  const days=Math.floor(totalMinutes/1440);
+  const hours=Math.floor((totalMinutes%1440)/60);
+  const minutes=totalMinutes%60;
+  const remaining=days>0 ? `${days}일 ${hours}시간 ${minutes}분`
+    : hours>0 ? `${hours}시간 ${minutes}분` : `${minutes}분`;
+
+  const eventDateText=new Intl.DateTimeFormat('ko-KR',{
+    timeZone:chosen.zone,year:'numeric',month:'2-digit',day:'2-digit',
+    weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false
+  }).format(chosen.instant);
+
+  if(nextTime) nextTime.textContent=chosen.timeText;
   if(nextPlace) nextPlace.textContent=chosen.place;
+  if(nextZone) nextZone.textContent=chosen.zoneLabel;
+  if(countdown) countdown.textContent=remaining+' 남음';
+  if(countdownDate) countdownDate.textContent=eventDateText+' · '+chosen.zoneLabel;
   if(nextTitle) nextTitle.textContent=chosen.place;
   if(nextNote) nextNote.textContent=chosen.note||'';
   if(g) g.href=chosen.map||'#';
   if(a) a.href='https://maps.apple.com/?q='+encodeURIComponent(chosen.place);
 
-  if(countdown && t!==null){
-    let diff=t-nowMin;
-    if(diff<0) diff+=1440;
-    countdown.textContent=diff<=30 ? `${diff}분 전` : `${diff}분 남음`;
-    countdown.style.color=diff<=30?'#b42318':'var(--brand)';
+  const level=totalMinutes<=5?'urgent':totalMinutes<=30?'soon':'normal';
+  if(countdownBox) countdownBox.className='schedule-summary-box countdown-box '+level;
+  if(badge){
+    badge.textContent=level==='urgent'?'곧 시작':level==='soon'?'30분 이내':'예정';
+    badge.className='status-badge '+(level==='normal'?'':level);
   }
 }
 
@@ -1869,7 +1984,7 @@ if(goScheduleBtn){
 }
 
 updateHomeDashboard();
-setInterval(updateHomeDashboard,60000);
+setInterval(updateHomeDashboard,1000);
 
 renderShopping();renderExpenses();calc();parking();renderAlbum();
 </script>
@@ -2383,7 +2498,7 @@ if("serviceWorker" in navigator){
 
 
 <script>
-/* v15.2 정확한 한국/하와이 시각 및 일정 카운트다운 */
+/* v15.3 정확한 한국/하와이 시각 및 일정 카운트다운 */
 (function(){
   const HAWAII_TZ = "Pacific/Honolulu";
   const KOREA_TZ = "Asia/Seoul";
