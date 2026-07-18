@@ -2,5 +2,5 @@
 // OpenAI API 키는 이 파일에 넣지 않습니다.
 window.HAWAII_CONFIG = {
   supabaseFunctionUrl: "https://fjpczzjrzxsyqolwfebh.supabase.co/functions/v1/translate",
-  supabaseAnonKey: "sb_publishable_fJyTf76jWyoKDaBjQNLU5g_9pP6a4H6"
+  supabaseAnonKey: ""
 };
