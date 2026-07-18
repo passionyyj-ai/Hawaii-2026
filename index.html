@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="Hawaii 2026">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
-<title>Hawaii 2026 여행 앱 v11.0</title>
+<title>Hawaii 2026 여행 앱 v13.0 Ultimate</title>
 <style>
 :root {
  --bg:#f4f7f8;--card:#fff;--text:#17323a;--muted:#697a80;
@@ -177,11 +177,36 @@ h2{font-size:20px;margin:0}
   .interpreter-panel{min-height:180px}
 }
 
+
+.translation-result{margin-top:10px;border:2px solid #b7e2df;border-radius:15px;padding:13px;background:#f4fffd}
+.translation-result .label{font-size:12px;font-weight:950;color:var(--muted);margin-bottom:5px}
+.translation-result .text{font-size:20px;line-height:1.45;font-weight:900;white-space:pre-wrap}
+.translation-result.loading{opacity:.65}
+.translation-error{margin-top:8px;padding:9px 11px;border-radius:10px;background:#fff2f2;color:#a13b3b;font-size:13px;font-weight:800}
+.translation-settings{display:grid;gap:8px}
+.api-light{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:900}
+.api-dot{width:9px;height:9px;border-radius:50%;background:#aaa}
+.api-dot.ok{background:#29a36a}.api-dot.bad{background:#d94b4b}
+
+
+.gpt-badge{display:inline-flex;align-items:center;gap:5px;background:#ecf7ff;color:#315f86;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:950}
+.ai-note{border-left:4px solid var(--brand);padding:9px 11px;background:#f5fbfb;border-radius:10px;font-size:13px}
+
+
+.quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.chip{border:1px solid #dce8ea;background:#fff;border-radius:999px;padding:10px;font-weight:800}
+.suggestion-list{display:grid;gap:8px;margin-top:8px}
+.suggestion-item{background:#f7fafb;border-radius:12px;padding:10px 12px;border:1px solid #e5edef}
+.translation-result{white-space:pre-wrap;line-height:1.55}
+textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius:12px;padding:12px;font:inherit}
+@media(max-width:430px){.quick-grid{grid-template-columns:1fr 1fr}}
+
 </style>
+<script src="./config.js"></script>
 </head>
 <body>
 <input class="day-radio" type="radio" name="day" id="day0" checked><input class="day-radio" type="radio" name="day" id="day1"><input class="day-radio" type="radio" name="day" id="day2"><input class="day-radio" type="radio" name="day" id="day3"><input class="day-radio" type="radio" name="day" id="day4"><input class="day-radio" type="radio" name="day" id="day5"><input class="day-radio" type="radio" name="day" id="day6"><input class="day-radio" type="radio" name="day" id="day7"><input class="day-radio" type="radio" name="day" id="day8">
-<div class="app"><div class="version-banner">✅ Hawaii App v11.0 · 양방향 통역 기능 적용됨</div>
+<div class="app"><div class="version-banner">✅ Hawaii App v13.0 Ultimate · AI 여행 비서 · GPT 통역 적용됨</div>
 <header class="hero">
   <div class="eyebrow">MY OAHU TRIP</div>
   <h1>🌺 Hawaii 2026</h1>
@@ -1067,8 +1092,12 @@ h2{font-size:20px;margin:0}
   <section class="card">
     <div class="section-title"><h2>🔤 자유 번역</h2><small>Google 번역</small></div>
     <label class="field"><span>한국어 입력</span><textarea id="translateInput" placeholder="번역할 한국어 문장을 입력하세요."></textarea></label>
+    <div id="freeTranslationWrap" class="translation-result hidden">
+      <div class="label">🇺🇸 영어 번역</div>
+      <div id="freeTranslationResult" class="text"></div>
+    </div>
     <div class="inline-actions">
-      <button id="openTranslate" class="btn" type="button">영어로 번역</button>
+      <button id="openTranslate" class="btn" type="button">앱에서 영어로 번역</button>
       <button id="speakKorean" class="btn secondary" type="button">한국어 읽기</button>
     </div>
   </section>
@@ -1089,6 +1118,7 @@ h2{font-size:20px;margin:0}
   <section class="card">
     <div class="section-title"><h2>🎙 양방향 통역</h2><small>음성 인식 + 번역 연결</small></div>
     <div class="notice">
+      <b>GPT가 여행 상황과 최근 대화 문맥을 반영해 자연스럽게 통역합니다.</b><br>
       상대방의 영어를 문자로 받아 적은 뒤 한국어 번역을 열 수 있습니다.
       내가 한국어로 말한 내용도 영어 번역으로 바로 연결됩니다.
     </div>
@@ -1101,8 +1131,12 @@ h2{font-size:20px;margin:0}
         <h3>🇺🇸 상대방 영어</h3>
         <div id="heardEnglish" class="interpreter-text">영어 듣기 버튼을 누른 뒤 상대방에게 말해 달라고 하세요.</div>
         <button id="listenEnglishBtn" class="mic-button" type="button">🎤 영어 듣기</button>
+        <div id="englishTranslationWrap" class="translation-result hidden">
+          <div class="label">🇰🇷 한국어 번역</div>
+          <div id="englishTranslation" class="text"></div>
+        </div>
         <div class="inline-actions">
-          <button id="translateEnglishBtn" class="btn secondary" type="button">한국어 번역 보기</button>
+          <button id="translateEnglishBtn" class="btn secondary" type="button">앱에서 한국어 번역</button>
           <button id="copyEnglishBtn" class="btn ghost" type="button">복사</button>
           <button id="clearEnglishBtn" class="btn ghost" type="button">지우기</button>
         </div>
@@ -1112,9 +1146,13 @@ h2{font-size:20px;margin:0}
         <h3>🇰🇷 내가 할 말</h3>
         <div id="spokenKorean" class="interpreter-text">한국어 말하기 버튼을 누르고 하고 싶은 말을 말하세요.</div>
         <button id="listenKoreanBtn" class="mic-button" type="button">🎤 한국어 말하기</button>
+        <div id="koreanTranslationWrap" class="translation-result hidden">
+          <div class="label">🇺🇸 영어 번역</div>
+          <div id="koreanTranslation" class="text"></div>
+        </div>
         <div class="inline-actions">
-          <button id="translateKoreanBtn" class="btn secondary" type="button">영어 번역 보기</button>
-          <button id="speakKoreanTextBtn" class="btn ghost" type="button">🔊 한국어 확인</button>
+          <button id="translateKoreanBtn" class="btn secondary" type="button">앱에서 영어 번역</button>
+          <button id="speakTranslatedEnglishBtn" class="btn ghost" type="button">🔊 번역 영어 읽기</button>
           <button id="clearKoreanBtn" class="btn ghost" type="button">지우기</button>
         </div>
       </div>
@@ -1132,14 +1170,27 @@ h2{font-size:20px;margin:0}
   </section>
 
   <section class="card">
-    <div class="section-title"><h2>📱 전용 통역 앱 열기</h2><small>실시간 번역이 더 안정적</small></div>
-    <div class="inline-actions">
-      <a class="btn" href="https://translate.google.com/?sl=auto&tl=ko&op=translate">Google 번역</a>
-      <a class="btn secondary" href="https://chatgpt.com/">ChatGPT 음성</a>
+    <div class="section-title"><h2>🤖 GPT 통역 연결 상태</h2><span id="translationApiState" class="api-light"><span class="api-dot"></span>확인 중</span></div>
+    <div class="translation-settings">
+      <div class="note">GPT 번역은 Cloudflare Worker을 통해 처리되어 OpenAI API 키가 앱에 노출되지 않습니다.</div>
+      
+      <label class="field">
+        <span>통역 스타일</span>
+        <select id="translationStyle">
+          <option value="natural">자연스럽고 공손하게</option>
+          <option value="literal">원문에 가깝게</option>
+          <option value="simple">짧고 쉽게</option>
+        </select>
+      </label>
+      <label class="done-label"><input id="useContextToggle" type="checkbox" checked> 최근 대화 문맥을 반영</label>
+
+      <label class="done-label"><input id="autoTranslateToggle" type="checkbox" checked> 음성 인식 후 자동 번역</label>
+      <label class="done-label"><input id="autoSpeakToggle" type="checkbox" checked> 한국어→영어 번역 후 자동 읽기</label>
     </div>
-    <div class="note" style="margin-top:8px">
-      브라우저 음성 인식은 기기와 Safari 버전에 따라 지원 범위가 다릅니다.
-      인식 버튼이 작동하지 않으면 위 전용 통역 기능을 사용하세요.
+    <div id="translationApiError" class="translation-error hidden"></div>
+    <div class="inline-actions" style="margin-top:10px">
+      <button id="testTranslationApi" class="btn secondary" type="button">연결 테스트</button>
+      <a class="btn ghost" href="https://translate.google.com/?sl=auto&tl=ko&op=translate">비상용 Google 번역</a>
     </div>
   </section>
 </section>
@@ -1531,23 +1582,73 @@ h2{font-size:20px;margin:0}
 <section class="card"><div class="section-title"><h2>🍴 추천 맛집</h2><small id="foodSummary"></small></div><div id="foodList"></div></section>
   <section class="card"><h2 style="margin-bottom:10px">📷 여행 앨범</h2><label class="field"><span>사진 추가</span><input id="albumFile" type="file" accept="image/*" multiple></label><div id="albumGrid" class="album-grid"></div><div class="inline-actions"><button class="btn ghost" id="clearAlbum">앨범 비우기</button></div></section>
 </section>
+
+<section class="page" id="page-ai">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">V13 ULTIMATE</div>
+      <h2>🧭 AI 여행 비서</h2>
+      <p>하와이 현장에서 들은 말, 사진, 상황을 바탕으로 다음 행동까지 추천합니다.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="gpt-badge">🤖 상황 이해형 AI</div>
+    <label class="field">
+      <span>지금 어떤 도움이 필요한가요?</span>
+      <textarea id="aiTravelInput" rows="4" placeholder="예: 렌터카 직원이 차량을 가득 주유해서 반납하라고 했어. 어떻게 확인하면 돼?"></textarea>
+    </label>
+    <div class="quick-grid">
+      <button class="chip ai-preset" data-text="호텔 체크인할 때 예약 확인과 보증금에 대해 물어볼 표현을 알려줘">🏨 호텔 체크인</button>
+      <button class="chip ai-preset" data-text="렌터카 수령할 때 보험, 연료, 반납 조건을 확인할 표현을 알려줘">🚙 렌터카</button>
+      <button class="chip ai-preset" data-text="식당에서 알레르기, 추천 메뉴, 계산을 물어볼 표현을 알려줘">🍽️ 식당</button>
+      <button class="chip ai-preset" data-text="투어가 지연되거나 취소됐을 때 확인할 질문을 알려줘">🌊 투어 문제</button>
+    </div>
+    <button class="primary wide" id="askTravelAiBtn">AI에게 물어보기</button>
+  </div>
+
+  <div class="card hidden" id="aiTravelResultWrap">
+    <h3>추천 안내</h3>
+    <div id="aiTravelSummary" class="ai-note"></div>
+    <h4>바로 사용할 영어</h4>
+    <div id="aiTravelEnglish" class="translation-result"></div>
+    <div class="button-row">
+      <button id="speakAiEnglishBtn">🔊 영어 읽기</button>
+      <button id="copyAiEnglishBtn">📋 복사</button>
+    </div>
+    <h4>다음에 확인할 내용</h4>
+    <div id="aiTravelActions" class="suggestion-list"></div>
+  </div>
+
+  <div class="card">
+    <h3>📷 메뉴판·표지판 사진 번역</h3>
+    <p class="muted">사진을 선택하면 핵심 내용을 한국어로 번역하고 주의할 점을 알려줍니다.</p>
+    <input id="visionImageInput" type="file" accept="image/*" capture="environment">
+    <img id="visionPreview" class="hidden" alt="선택한 사진 미리보기" style="max-width:100%;border-radius:14px;margin-top:10px">
+    <button class="primary wide" id="analyzeImageBtn">사진 분석·번역</button>
+    <div id="visionResultWrap" class="hidden">
+      <div id="visionResult" class="translation-result"></div>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <nav class="bottom">
   <button class="active" data-page="home"><span>🏠</span>홈</button>
   <button data-page="schedule"><span>📅</span>일정</button>
   <button data-page="english"><span>🗣</span>영어</button>
-  <button data-page="interpreter"><span>🎙</span>통역</button>
+  <button class="nav-btn" data-page="ai"><span>🧭</span><small>AI 비서</small></button><button data-page="interpreter"><span>🎙</span>통역</button>
   <button data-page="reservation"><span>🎫</span>예약</button>
   <button data-page="tools"><span>🧰</span>도구</button>
   <button data-page="explore"><span>🌴</span>탐색</button>
   <button data-page="check"><span>✅</span>준비물</button>
 </nav>
-<div class="footer">Hawaii Travel App v11.0 · PWA</div>
+<div class="footer">Hawaii Travel App v13.0 Ultimate · AI 여행 비서 · GPT 통역</div>
 </div>
 
 <script>
-const STORE_PREFIX = "hawaii_v11_";
+const STORE_PREFIX = "hawaii_v13_";
 const save = (k,v) => localStorage.setItem(STORE_PREFIX+k,v);
 const load = k => localStorage.getItem(STORE_PREFIX+k);
 
@@ -1849,7 +1950,7 @@ function renderPhrases(){const q=(document.getElementById("phraseSearch")?.value
 document.getElementById("phraseSearch")?.addEventListener("input",renderPhrases);
 document.getElementById("bigClose")?.addEventListener("click",()=>document.getElementById("bigOverlay").classList.remove("show"));
 document.getElementById("bigOverlay")?.addEventListener("click",e=>{if(e.target.id==="bigOverlay")e.currentTarget.classList.remove("show")});
-document.getElementById("openTranslate")?.addEventListener("click",()=>{const t=document.getElementById("translateInput").value.trim();if(!t){alert("번역할 문장을 입력하세요.");return}location.href="https://translate.google.com/?sl=ko&tl=en&text="+encodeURIComponent(t)+"&op=translate"});
+
 document.getElementById("speakKorean")?.addEventListener("click",()=>{const t=document.getElementById("translateInput").value.trim();if(t)speak(t,"ko-KR")});
 renderCategories();renderPhrases();
 </script>
@@ -1973,24 +2074,13 @@ if("serviceWorker" in navigator){
     listen("ko-KR",koBox,koBtn,"내 한국어");
   });
 
-  document.getElementById("translateEnglishBtn")?.addEventListener("click",()=>{
-    const t=enBox.textContent.trim();
-    if(!t || t.includes("버튼을 누른")){alert("먼저 상대방의 영어를 인식하세요.");return;}
-    location.href="https://translate.google.com/?sl=en&tl=ko&text="+encodeURIComponent(t)+"&op=translate";
-  });
-  document.getElementById("translateKoreanBtn")?.addEventListener("click",()=>{
-    const t=koBox.textContent.trim();
-    if(!t || t.includes("버튼을 누르고")){alert("먼저 한국어로 말하세요.");return;}
-    location.href="https://translate.google.com/?sl=ko&tl=en&text="+encodeURIComponent(t)+"&op=translate";
-  });
+  
+  
   document.getElementById("copyEnglishBtn")?.addEventListener("click",()=>{
     const t=enBox.textContent.trim();
     navigator.clipboard?.writeText(t).then(()=>alert("복사했습니다.")).catch(()=>prompt("복사하세요.",t));
   });
-  document.getElementById("speakKoreanTextBtn")?.addEventListener("click",()=>{
-    const t=koBox.textContent.trim();
-    if(t) speak(t,"ko-KR");
-  });
+  
   document.getElementById("clearEnglishBtn")?.addEventListener("click",()=>enBox.textContent="영어 듣기 버튼을 누른 뒤 상대방에게 말해 달라고 하세요.");
   document.getElementById("clearKoreanBtn")?.addEventListener("click",()=>koBox.textContent="한국어 말하기 버튼을 누르고 하고 싶은 말을 말하세요.");
   document.getElementById("clearConversationLog")?.addEventListener("click",()=>{
@@ -2023,6 +2113,252 @@ if("serviceWorker" in navigator){
     });
   }
   renderLog();
+})();
+</script>
+
+
+<script>
+/* v13 GPT 기반 AI 통역 */
+(function(){
+  const cfg = window.HAWAII_CONFIG || {};
+  const apiState = document.getElementById("translationApiState");
+  const apiError = document.getElementById("translationApiError");
+  const autoTranslate = document.getElementById("autoTranslateToggle");
+  const autoSpeak = document.getElementById("autoSpeakToggle");
+  const styleSelect = document.getElementById("translationStyle");
+  const useContext = document.getElementById("useContextToggle");
+
+  const settings = (() => {
+    try { return JSON.parse(localStorage.getItem(STORE_PREFIX+"translation_settings") || "{}"); }
+    catch(e) { return {}; }
+  })();
+  if(autoTranslate) autoTranslate.checked = settings.autoTranslate !== false;
+  if(autoSpeak) autoSpeak.checked = settings.autoSpeak !== false;
+  if(useContext) useContext.checked = settings.useContext !== false;
+  if(styleSelect && settings.style) styleSelect.value = settings.style;
+
+  function saveSettings(){
+    localStorage.setItem(STORE_PREFIX+"translation_settings", JSON.stringify({
+      autoTranslate: !!autoTranslate?.checked,
+      autoSpeak: !!autoSpeak?.checked,
+      useContext: !!useContext?.checked,
+      style: styleSelect?.value || "natural"
+    }));
+  }
+  [autoTranslate,autoSpeak,useContext,styleSelect].forEach(x=>x?.addEventListener("change",saveSettings));
+
+  function setApiState(ok, message){
+    if(!apiState) return;
+    apiState.innerHTML = `<span class="api-dot ${ok ? "ok" : "bad"}"></span>${message}`;
+  }
+  function showApiError(message){
+    if(!apiError) return;
+    apiError.textContent = message;
+    apiError.classList.toggle("hidden", !message);
+  }
+  function endpoint(){
+    return String(cfg.workerUrl || "").trim();
+  }
+  function recentContext(){
+    if(!useContext?.checked) return [];
+    try{
+      const items=JSON.parse(localStorage.getItem(STORE_PREFIX+"interpreter_log")||"[]");
+      return items.slice(0,6).reverse().map(x=>({speaker:x.who,text:x.text}));
+    }catch(e){return []}
+  }
+  async function translateText(text, source, target){
+    if(!text?.trim()) throw new Error("번역할 문장이 없습니다.");
+    if(!endpoint()){
+      throw new Error("config.js에 Cloudflare Worker 주소를 설정해야 합니다.");
+    }
+    const response = await fetch(endpoint(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(cfg.workerAccessKey ? {"X-App-Key": cfg.workerAccessKey} : {})
+      },
+      body: JSON.stringify({
+        text: text.trim(),
+        source,
+        target,
+        style: styleSelect?.value || "natural",
+        context: recentContext()
+      })
+    });
+    let data = {};
+    try { data = await response.json(); } catch(e) {}
+    if(!response.ok) throw new Error(data.error || `GPT 통역 서버 오류 (${response.status})`);
+    if(!data.translatedText) throw new Error("GPT 번역 결과가 없습니다.");
+    return data.translatedText;
+  }
+  async function runTranslation(opts){
+    const {text, source, target, wrap, output, speakResult=false} = opts;
+    wrap?.classList.remove("hidden");
+    wrap?.classList.add("loading");
+    output.textContent = "GPT가 통역하는 중…";
+    showApiError("");
+    try{
+      const result = await translateText(text, source, target);
+      output.textContent = result;
+      setApiState(true, "GPT 연결됨");
+      if(speakResult && autoSpeak?.checked && typeof speak === "function") {
+        speak(result, target==="en"?"en-US":"ko-KR");
+      }
+      return result;
+    }catch(err){
+      output.textContent = "통역 실패";
+      setApiState(false, "연결 필요");
+      showApiError(err.message);
+      throw err;
+    }finally{
+      wrap?.classList.remove("loading");
+    }
+  }
+
+  const enBox = document.getElementById("heardEnglish");
+  const koBox = document.getElementById("spokenKorean");
+  const enWrap = document.getElementById("englishTranslationWrap");
+  const koWrap = document.getElementById("koreanTranslationWrap");
+  const enOut = document.getElementById("englishTranslation");
+  const koOut = document.getElementById("koreanTranslation");
+
+  document.getElementById("translateEnglishBtn")?.addEventListener("click", async()=>{
+    const t=enBox.textContent.trim();
+    if(!t || t.includes("버튼을 누른")){alert("먼저 상대방의 영어를 인식하세요.");return;}
+    try{await runTranslation({text:t,source:"en",target:"ko",wrap:enWrap,output:enOut});}catch(e){}
+  });
+  document.getElementById("translateKoreanBtn")?.addEventListener("click", async()=>{
+    const t=koBox.textContent.trim();
+    if(!t || t.includes("버튼을 누르고")){alert("먼저 한국어로 말하세요.");return;}
+    try{await runTranslation({text:t,source:"ko",target:"en",wrap:koWrap,output:koOut,speakResult:true});}catch(e){}
+  });
+  document.getElementById("speakTranslatedEnglishBtn")?.addEventListener("click",()=>{
+    const t=koOut?.textContent.trim();
+    if(t && !t.includes("통역") && t!=="통역 실패") speak(t,"en-US");
+    else alert("먼저 영어 통역을 실행하세요.");
+  });
+  document.getElementById("clearEnglishBtn")?.addEventListener("click",()=>enWrap?.classList.add("hidden"));
+  document.getElementById("clearKoreanBtn")?.addEventListener("click",()=>koWrap?.classList.add("hidden"));
+
+  document.getElementById("openTranslate")?.addEventListener("click", async()=>{
+    const input=document.getElementById("translateInput");
+    const wrap=document.getElementById("freeTranslationWrap");
+    const out=document.getElementById("freeTranslationResult");
+    const t=input.value.trim();
+    if(!t){alert("번역할 문장을 입력하세요.");return;}
+    try{await runTranslation({text:t,source:"ko",target:"en",wrap,output:out,speakResult:false});}catch(e){}
+  });
+
+  function autoObserve(element, lang){
+    if(!element) return;
+    let timer=null, last="";
+    new MutationObserver(()=>{
+      clearTimeout(timer);
+      timer=setTimeout(()=>{
+        const text=element.textContent.trim();
+        if(!autoTranslate?.checked || !text || text===last || text.includes("듣고") || text.includes("버튼을") || text.includes("오류") || text.includes("권한")) return;
+        last=text;
+        if(lang==="en"){
+          runTranslation({text,source:"en",target:"ko",wrap:enWrap,output:enOut}).catch(()=>{});
+        }else{
+          runTranslation({text,source:"ko",target:"en",wrap:koWrap,output:koOut,speakResult:true}).catch(()=>{});
+        }
+      },700);
+    }).observe(element,{childList:true,characterData:true,subtree:true});
+  }
+  autoObserve(enBox,"en");
+  autoObserve(koBox,"ko");
+
+  document.getElementById("testTranslationApi")?.addEventListener("click", async()=>{
+    showApiError("");
+    setApiState(false,"GPT 테스트 중");
+    try{
+      const r=await translateText("Hello, I have a reservation.","en","ko");
+      setApiState(true,"GPT 정상 연결");
+      alert("GPT 통역 서버 연결 성공: "+r);
+    }catch(err){
+      setApiState(false,"연결 실패");
+      showApiError(err.message);
+    }
+  });
+
+  if(endpoint()) setApiState(true,"Cloudflare Worker 설정됨");
+  else setApiState(false,"config.js 설정 필요");
+})();
+</script>
+
+
+<script>
+(function(){
+  const cfg = window.HAWAII_CONFIG || {};
+  const callWorker = async(payload)=>{
+    const url=String(cfg.workerUrl||"").trim();
+    if(!url) throw new Error("config.js에 Cloudflare Worker 주소를 입력하세요.");
+    const r=await fetch(url,{
+      method:"POST",
+      headers:{"Content-Type":"application/json",...(cfg.workerAccessKey?{"X-App-Key":cfg.workerAccessKey}:{})},
+      body:JSON.stringify(payload)
+    });
+    let data={}; try{data=await r.json()}catch(e){}
+    if(!r.ok) throw new Error(data.error||`AI 서버 오류 (${r.status})`);
+    return data;
+  };
+
+  document.querySelectorAll(".ai-preset").forEach(btn=>btn.addEventListener("click",()=>{
+    const el=document.getElementById("aiTravelInput");
+    el.value=btn.dataset.text||"";
+    el.focus();
+  }));
+
+  let lastAiEnglish="";
+  document.getElementById("askTravelAiBtn")?.addEventListener("click",async()=>{
+    const input=document.getElementById("aiTravelInput");
+    const wrap=document.getElementById("aiTravelResultWrap");
+    const summary=document.getElementById("aiTravelSummary");
+    const english=document.getElementById("aiTravelEnglish");
+    const actions=document.getElementById("aiTravelActions");
+    const text=input.value.trim();
+    if(!text){alert("상황을 입력해 주세요.");return;}
+    wrap.classList.remove("hidden");
+    summary.textContent="AI가 상황을 정리하는 중…"; english.textContent=""; actions.innerHTML="";
+    try{
+      const data=await callWorker({mode:"assistant",text});
+      summary.textContent=data.summary||"";
+      lastAiEnglish=data.english||"";
+      english.textContent=lastAiEnglish;
+      const arr=Array.isArray(data.actions)?data.actions:[];
+      actions.innerHTML=arr.map(x=>`<div class="suggestion-item">• ${String(x)}</div>`).join("");
+    }catch(e){ summary.textContent="오류: "+e.message; }
+  });
+
+  document.getElementById("speakAiEnglishBtn")?.addEventListener("click",()=>{
+    if(lastAiEnglish && typeof speak==="function") speak(lastAiEnglish,"en-US");
+  });
+  document.getElementById("copyAiEnglishBtn")?.addEventListener("click",async()=>{
+    if(!lastAiEnglish)return;
+    await navigator.clipboard.writeText(lastAiEnglish);
+    alert("영어 문장을 복사했습니다.");
+  });
+
+  let imageData="";
+  const fileInput=document.getElementById("visionImageInput");
+  fileInput?.addEventListener("change",()=>{
+    const file=fileInput.files?.[0]; if(!file)return;
+    if(file.size>6*1024*1024){alert("사진은 6MB 이하로 선택해 주세요.");fileInput.value="";return;}
+    const reader=new FileReader();
+    reader.onload=()=>{imageData=String(reader.result||"");const p=document.getElementById("visionPreview");p.src=imageData;p.classList.remove("hidden");};
+    reader.readAsDataURL(file);
+  });
+  document.getElementById("analyzeImageBtn")?.addEventListener("click",async()=>{
+    if(!imageData){alert("먼저 사진을 선택하세요.");return;}
+    const wrap=document.getElementById("visionResultWrap");
+    const out=document.getElementById("visionResult");
+    wrap.classList.remove("hidden"); out.textContent="사진을 분석하는 중…";
+    try{
+      const data=await callWorker({mode:"vision",image:imageData});
+      out.textContent=data.result||"분석 결과가 없습니다.";
+    }catch(e){out.textContent="오류: "+e.message;}
+  });
 })();
 </script>
 
