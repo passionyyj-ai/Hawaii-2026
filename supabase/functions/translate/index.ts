@@ -80,7 +80,7 @@ Deno.serve(async (req: Request) => {
       payload = {
         model,
         instructions: `You are a practical Korean travel assistant for a Hawaii trip.
-Return valid JSON only with these keys:
+Return valid JSON only. The response must be a JSON object with these keys:
 summary: concise Korean explanation of the situation,
 english: one or more natural, polite English sentences the traveler can say immediately,
 actions: array of 2 to 4 concise Korean next-step suggestions.

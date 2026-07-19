@@ -7,12 +7,12 @@
 <meta name="theme-color" content="#087f8c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Hawaii 2026">
+<meta name="apple-mobile-web-app-title" content="TravelMate AI">
 <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./favicon.ico">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <link rel="apple-touch-icon" href="./icon-192.png">
-<title>Hawaii 2026 여행 앱 v15.3 Ultimate</title>
+<title>TravelMate AI 여행 앱 v17 Multi-Trip</title>
 <style>
 :root {
  --bg:#f4f7f8;--card:#fff;--text:#17323a;--muted:#697a80;
@@ -238,16 +238,41 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
 .status-badge.soon{background:#fff1d6;color:#a75d00}.status-badge.urgent{background:#ffe1de;color:#b42318}.status-badge.done{background:#edf1f2;color:#63767b}
 @media(max-width:640px){.dual-time-grid,.schedule-summary-grid{grid-template-columns:1fr}.zone-clock{font-size:31px}.schedule-summary-box{min-height:auto}}
 
+
+.nav{overflow-x:auto;justify-content:flex-start}.nav button{flex:0 0 auto}
+.trip-context-banner{background:linear-gradient(135deg,#0a8791,#3bbdb5);color:white;padding:14px 16px;border-radius:16px;margin-bottom:12px}
+.expense-row{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+
+.countdown-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px}
+.countdown-title-row small{margin-bottom:0!important}
+.countdown-refresh-btn{border:1px solid #bfe6e3;background:#fff;color:var(--brand);font-weight:900;border-radius:999px;padding:7px 11px;font-size:12px;line-height:1;box-shadow:0 3px 10px rgba(10,135,145,.08)}
+.countdown-refresh-btn:active{transform:scale(.97)}
+.countdown-refresh-btn.refreshing{opacity:.65;pointer-events:none}
+.countdown-updated{font-size:11px;color:var(--muted);margin-top:5px}
+
+
+.trip-banner-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+#quickTripSwitcher{width:auto;min-width:170px;background:rgba(255,255,255,.96);border:0;border-radius:999px;padding:9px 12px;font-weight:900;color:var(--text)}
+.trip-active-summary{padding:14px;border-radius:16px;background:linear-gradient(135deg,#eefaf8,#f8fcfc);border:1px solid #cbeae7;margin-bottom:14px}
+.trip-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.trip-card{border:1px solid var(--line);border-radius:18px;padding:16px;background:white;position:relative;overflow:hidden}
+.trip-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--trip-color,#0a8791)}
+.trip-card.active{box-shadow:0 0 0 2px rgba(10,135,145,.18);border-color:#9edbd7}
+.trip-card h3{margin:0 0 6px;padding-left:4px}.trip-card-meta{color:var(--muted);font-size:13px;margin-bottom:10px;padding-left:4px}
+.trip-card-dates{font-size:13px;font-weight:800;margin-bottom:12px;padding-left:4px}
+.trip-card-actions{display:flex;gap:7px;flex-wrap:wrap}.trip-card-actions button{padding:8px 10px;border-radius:12px;font-size:12px;font-weight:850}
+.trip-status-pill{position:absolute;right:12px;top:12px;padding:5px 8px;border-radius:999px;background:#e9f8f6;color:var(--brand);font-size:11px;font-weight:950}
+@media(max-width:700px){.trip-list{grid-template-columns:1fr}.trip-banner-top{align-items:flex-start;flex-direction:column}#quickTripSwitcher{width:100%}}
 </style>
 <script src="./config.js"></script>
 </head>
 <body>
 <input class="day-radio" type="radio" name="day" id="day0" checked><input class="day-radio" type="radio" name="day" id="day1"><input class="day-radio" type="radio" name="day" id="day2"><input class="day-radio" type="radio" name="day" id="day3"><input class="day-radio" type="radio" name="day" id="day4"><input class="day-radio" type="radio" name="day" id="day5"><input class="day-radio" type="radio" name="day" id="day6"><input class="day-radio" type="radio" name="day" id="day7"><input class="day-radio" type="radio" name="day" id="day8">
-<div class="app"><div class="version-banner">✅ Hawaii App v15.3 Ultimate · AI 여행 비서 · GPT 통역 적용됨</div>
+<div class="app"><div class="version-banner">✅ Hawaii App v17 Multi-Trip · AI 여행 비서 · GPT 통역 적용됨</div>
 <header class="hero">
-  <div class="eyebrow">MY OAHU TRIP</div>
-  <h1>🌺 Hawaii 2026</h1>
-  <p>9월 4일 ~ 9월 12일 · 와이키키 베이스</p>
+  <div class="eyebrow">MY TRIP AGENT</div>
+  <h1>🌺 TravelMate AI</h1>
+  <p>9월 4일 ~ 9월 12일 · 해외여행 범용 에이전트</p>
   <div class="stats">
     <div class="stat">여행 기간<b>8박 10일</b></div>
     <div class="stat">항공편<b>KE053 / KE054</b></div>
@@ -257,6 +282,8 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
 <main>
 
 <section id="homePage" class="page active">
+<div class="trip-context-banner"><div class="trip-banner-top"><div><small>현재 여행</small><div id="currentTripLabel" style="font-size:19px;font-weight:900">여행 설정이 필요합니다.</div><div id="currentTripMeta"></div></div><select id="quickTripSwitcher" aria-label="현재 여행 선택"></select></div></div>
+
   
 <section class="card time-zone-card">
   <div class="section-title">
@@ -266,7 +293,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
   <div class="dual-time-grid">
     <div class="time-zone-box hawaii-time-box">
       <div class="time-zone-head">
-        <div><div class="time-zone-label">🌺 하와이 현지 시각</div><div class="time-zone-name">Pacific/Honolulu · HST</div></div>
+        <div><div class="time-zone-label">🌺 여행지 현지 시각</div><div class="time-zone-name">선택한 여행지 시간대</div></div>
         <span class="zone-pill">Honolulu</span>
       </div>
       <div id="hawaiiClock" class="zone-clock">--:--:--</div>
@@ -281,7 +308,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
       <div id="koreaDate" class="zone-date">날짜 확인 중</div>
     </div>
   </div>
-  <div class="time-difference">한국이 하와이보다 19시간 빠릅니다.</div>
+  <div class="time-difference">한국과 여행지의 시차를 자동 계산합니다.</div>
 </section>
 
   
@@ -298,10 +325,13 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
       <div id="nextTimeZone" class="schedule-zone-label">시간대 확인 중</div>
     </div>
     <div id="countdownBox" class="schedule-summary-box countdown-box">
-      <small>남은 시간</small>
+      <div class="countdown-title-row">
+          <small>남은 시간</small>
+          <button id="refreshCountdownBtn" class="countdown-refresh-btn" type="button">↻ 새로고침</button>
+        </div>
       <b id="countdownText">--</b>
       <div id="nextEventDateTime" class="countdown-date">일정 날짜 확인 중</div>
-      <div class="countdown-hint">일정 날짜와 시간을 기준으로 계산합니다.</div>
+      <div class="countdown-hint">일정 날짜와 시간을 기준으로 계산합니다.</div><div id="countdownUpdatedAt" class="countdown-updated">마지막 갱신: --:--:--</div>
     </div>
   </div>
   <div class="next-box">
@@ -1696,6 +1726,86 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
   </div>
 </section>
 
+
+<section class="page" id="walletPage">
+  <section class="card"><div class="section-title"><div><h2>👛 여행 지갑</h2><small>예약·보험·바우처를 한곳에 보관합니다.</small></div></div>
+  <div class="grid">
+    <label class="field"><span>여권 메모</span><textarea data-travel-store="passport" placeholder="만료일 등 민감하지 않은 정보만 저장"></textarea></label>
+    <label class="field"><span>여행자 보험</span><textarea data-travel-store="insurance" placeholder="보험사, 증권번호, 긴급 연락처"></textarea></label>
+    <label class="field"><span>항공권</span><textarea data-travel-store="flight" placeholder="편명, 출발시간, 예약번호"></textarea></label>
+    <label class="field"><span>호텔</span><textarea data-travel-store="hotel" placeholder="호텔명, 주소, 체크인, 예약번호"></textarea></label>
+    <label class="field"><span>렌터카</span><textarea data-travel-store="rental" placeholder="업체, 수령·반납, 연료 정책"></textarea></label>
+    <label class="field"><span>바우처</span><textarea data-travel-store="voucher" placeholder="투어명, 예약번호, 링크"></textarea></label>
+  </div><button class="primary" id="saveWalletBtn">지갑 저장</button></section>
+</section>
+
+<section class="page" id="expensePage">
+  <section class="card"><div class="section-title"><div><h2>💵 여행 비용</h2><small>현지 지출을 기록하고 원화로 환산합니다.</small></div></div>
+  <div class="grid">
+    <label class="field"><span>항목</span><input id="expenseTitle" placeholder="예: 식사, 택시"></label>
+    <label class="field"><span>금액</span><input id="expenseAmount" type="number" inputmode="decimal"></label>
+    <label class="field"><span>통화</span><input id="expenseCurrency" value="USD" maxlength="3"></label>
+    <label class="field"><span>원화 환율</span><input id="expenseRate" type="number" inputmode="decimal" value="1360"></label>
+  </div><button class="primary" id="addExpenseBtn">지출 추가</button>
+  <div id="expenseSummary" class="notice" style="margin-top:12px">총 지출 0건</div>
+  <div id="expenseList" style="margin-top:12px"></div></section>
+</section>
+
+<section class="page" id="emergencyPage">
+  <section class="card"><div class="section-title"><div><h2>🆘 긴급 상황</h2><small>국가별 번호와 개인 연락처를 빠르게 확인합니다.</small></div></div>
+  <div class="quick"><button data-emergency="police">경찰</button><button data-emergency="ambulance">구급</button><button data-emergency="embassy">한국 대사관</button><button data-emergency="card">카드 분실</button></div>
+  <div id="emergencyResult" class="translation-box">여행 국가를 설정하면 긴급 정보를 표시합니다.</div>
+  <label class="field" style="margin-top:12px"><span>개인 긴급 연락처</span><textarea data-travel-store="emergencyContact"></textarea></label>
+  <button class="primary" id="saveEmergencyBtn">연락처 저장</button></section>
+</section>
+
+<section class="page" id="settingsPage">
+  <section class="card"><div class="section-title"><div><h2>⚙️ 여행 설정</h2><small>여행지와 시간대를 바꾸면 앱 전체가 반영됩니다.</small></div></div>
+  <div class="grid">
+    <label class="field"><span>여행 이름</span><input id="tripName"></label>
+    <label class="field"><span>도시</span><input id="tripCity"></label>
+    <label class="field"><span>국가</span><input id="tripCountry"></label>
+    <label class="field"><span>IANA 시간대</span><input id="tripTimezone" placeholder="예: Asia/Tokyo"></label>
+    <label class="field"><span>통화</span><input id="tripCurrency" placeholder="예: JPY"></label>
+    <label class="field"><span>시작일</span><input id="tripStart" type="date"></label>
+    <label class="field"><span>종료일</span><input id="tripEnd" type="date"></label>
+  </div><button class="primary" id="saveTripSettings">설정 저장</button></section>
+</section>
+
+
+<section class="page" id="tripsPage">
+  <section class="card">
+    <div class="section-title">
+      <div><h2>🧳 여행 관리</h2><small>여러 여행을 저장하고 현재 여행을 전환합니다.</small></div>
+      <button class="primary" id="newTripBtn" type="button">+ 새 여행</button>
+    </div>
+    <div id="activeTripSummary" class="trip-active-summary"></div>
+    <div id="tripList" class="trip-list"></div>
+  </section>
+
+  <section class="card hidden" id="tripEditorCard">
+    <div class="section-title">
+      <div><h2 id="tripEditorTitle">새 여행 만들기</h2><small>도시·국가·시간대·통화·기간을 입력하세요.</small></div>
+      <button class="secondary" id="closeTripEditorBtn" type="button">닫기</button>
+    </div>
+    <input type="hidden" id="editTripId">
+    <div class="grid">
+      <label class="field"><span>여행 이름</span><input id="editTripName" placeholder="예: 2027 도쿄 가족여행"></label>
+      <label class="field"><span>도시</span><input id="editTripCity" placeholder="예: Tokyo"></label>
+      <label class="field"><span>국가</span><input id="editTripCountry" placeholder="예: Japan"></label>
+      <label class="field"><span>IANA 시간대</span><input id="editTripTimezone" placeholder="예: Asia/Tokyo"></label>
+      <label class="field"><span>통화</span><input id="editTripCurrency" placeholder="예: JPY" maxlength="3"></label>
+      <label class="field"><span>대표 색상</span><input id="editTripColor" type="color" value="#0a8791"></label>
+      <label class="field"><span>시작일</span><input id="editTripStart" type="date"></label>
+      <label class="field"><span>종료일</span><input id="editTripEnd" type="date"></label>
+    </div>
+    <div class="row wrap">
+      <button class="primary" id="saveTripBtn" type="button">여행 저장</button>
+      <button class="secondary" id="cancelTripBtn" type="button">취소</button>
+    </div>
+  </section>
+</section>
+
 </main>
 
 <nav class="bottom">
@@ -1707,8 +1817,15 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
   <button data-page="tools"><span>🧰</span>도구</button>
   <button data-page="explore"><span>🌴</span>탐색</button>
   <button data-page="check"><span>✅</span>준비물</button>
+
+<button data-page="wallet"><span>👛</span><small>지갑</small></button>
+<button data-page="expense"><span>💵</span><small>비용</small></button>
+<button data-page="emergency"><span>🆘</span><small>긴급</small></button>
+<button data-page="settings"><span>⚙️</span><small>설정</small></button>
+
+<button data-page="trips"><span>🧳</span><small>여행관리</small></button>
 </nav>
-<div class="footer">Hawaii Travel App v15.3 Ultimate · AI 여행 비서 · GPT 통역</div>
+<div class="footer">Hawaii Travel App v17 Multi-Trip · AI 여행 비서 · GPT 통역</div>
 </div>
 
 <script>
@@ -1860,7 +1977,7 @@ function honoluluNow(){
 }
 
 function updateHomeDashboard(){
-  const HAWAII_TZ='Pacific/Honolulu';
+  const HAWAII_TZ=getTripSettings().timezone||'Pacific/Honolulu';
   const KOREA_TZ='Asia/Seoul';
   const now=new Date();
 
@@ -2498,7 +2615,7 @@ if("serviceWorker" in navigator){
 
 
 <script>
-/* v15.3 정확한 한국/하와이 시각 및 일정 카운트다운 */
+/* v17.0 정확한 한국/하와이 시각 및 일정 카운트다운 */
 (function(){
   const HAWAII_TZ = "Pacific/Honolulu";
   const KOREA_TZ = "Asia/Seoul";
@@ -2599,6 +2716,159 @@ if("serviceWorker" in navigator){
   updateCountdown();
   setInterval(updateDualClocks,1000);
   setInterval(updateCountdown,30000);
+})();
+</script>
+
+
+
+
+
+<script>
+(function(){
+  function stampCountdownUpdate(){
+    const el=document.getElementById('countdownUpdatedAt');
+    if(!el)return;
+    el.textContent='마지막 갱신: '+new Intl.DateTimeFormat('ko-KR',{
+      hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
+    }).format(new Date());
+  }
+  window.refreshTravelCountdown=function(){
+    const btn=document.getElementById('refreshCountdownBtn');
+    if(btn){btn.classList.add('refreshing');btn.textContent='↻ 갱신 중';}
+    try{
+      if(typeof updateHomeDashboard==='function') updateHomeDashboard();
+      stampCountdownUpdate();
+    }finally{
+      setTimeout(()=>{if(btn){btn.classList.remove('refreshing');btn.textContent='↻ 새로고침';}},350);
+    }
+  };
+  document.getElementById('refreshCountdownBtn')?.addEventListener('click',window.refreshTravelCountdown);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')window.refreshTravelCountdown();});
+  window.addEventListener('focus',window.refreshTravelCountdown);
+  window.addEventListener('pageshow',window.refreshTravelCountdown);
+  setInterval(window.refreshTravelCountdown,30000);
+  window.refreshTravelCountdown();
+})();
+</script>
+
+
+<script>
+(function(){
+  const ROOT_KEY="travelmate_v17";
+  const LEGACY_KEY="travelmate_v16";
+  const defaultTrip={id:"trip-hawaii-2026",name:"2026 하와이 여행",city:"Honolulu",country:"United States",timezone:"Pacific/Honolulu",currency:"USD",start:"2026-09-04",end:"2026-09-12",color:"#0a8791"};
+
+  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+  const uid=()=>`trip-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,7)}`;
+
+  function loadTrips(){
+    try{const v=JSON.parse(localStorage.getItem(ROOT_KEY+"_trips")||"[]");if(Array.isArray(v)&&v.length)return v}catch{}
+    let first={...defaultTrip};
+    try{first={...first,...JSON.parse(localStorage.getItem(LEGACY_KEY+"_settings")||"{}"),id:defaultTrip.id}}catch{}
+    localStorage.setItem(ROOT_KEY+"_trips",JSON.stringify([first]));
+    localStorage.setItem(ROOT_KEY+"_active",first.id);
+    return [first];
+  }
+  const saveTrips=v=>localStorage.setItem(ROOT_KEY+"_trips",JSON.stringify(v));
+  function activeId(){
+    const trips=loadTrips(),saved=localStorage.getItem(ROOT_KEY+"_active");
+    return trips.some(t=>t.id===saved)?saved:trips[0].id;
+  }
+  function setActive(id){
+    localStorage.setItem(ROOT_KEY+"_active",id);
+    refreshAll();
+    if(typeof updateHomeDashboard==="function")updateHomeDashboard();
+    if(typeof refreshTravelCountdown==="function")refreshTravelCountdown();
+  }
+  window.getTripSettings=function(){
+    const trips=loadTrips();
+    return trips.find(t=>t.id===activeId())||trips[0]||defaultTrip;
+  };
+  const tripKey=(suffix,id=activeId())=>`${ROOT_KEY}_${id}_${suffix}`;
+  const range=t=>!t.start&&!t.end?"날짜 미정":(!t.end||t.start===t.end?t.start:`${t.start} ~ ${t.end}`);
+
+  function renderSwitcher(){
+    const trips=loadTrips(),active=activeId(),el=document.getElementById("quickTripSwitcher");
+    if(!el)return;
+    el.innerHTML=trips.map(t=>`<option value="${t.id}" ${t.id===active?"selected":""}>${esc(t.name)}</option>`).join("");
+  }
+  function renderTrips(){
+    const trips=loadTrips(),active=activeId(),list=document.getElementById("tripList"),summary=document.getElementById("activeTripSummary");
+    const current=trips.find(t=>t.id===active)||trips[0];
+    if(summary&&current)summary.innerHTML=`<b>현재 여행: ${esc(current.name)}</b><div class="muted">${esc(current.city)} · ${esc(current.country)} · ${esc(current.timezone)} · ${esc(current.currency)}</div><div style="margin-top:4px">${esc(range(current))}</div>`;
+    if(!list)return;
+    list.innerHTML=trips.map(t=>`<article class="trip-card ${t.id===active?"active":""}" style="--trip-color:${esc(t.color||"#0a8791")}">${t.id===active?'<span class="trip-status-pill">현재 여행</span>':""}<h3>${esc(t.name)}</h3><div class="trip-card-meta">${esc(t.city)} · ${esc(t.country)} · ${esc(t.currency)}</div><div class="trip-card-dates">${esc(range(t))}</div><div class="trip-card-actions">${t.id!==active?`<button class="primary" data-action="switch" data-id="${t.id}">이 여행 사용</button>`:""}<button class="secondary" data-action="edit" data-id="${t.id}">수정</button><button class="secondary" data-action="duplicate" data-id="${t.id}">복제</button>${trips.length>1?`<button class="secondary danger" data-action="delete" data-id="${t.id}">삭제</button>`:""}</div></article>`).join("");
+    list.querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>{
+      const id=b.dataset.id,a=b.dataset.action;
+      if(a==="switch")setActive(id);
+      if(a==="edit")openEditor(id);
+      if(a==="duplicate")duplicateTrip(id);
+      if(a==="delete")deleteTrip(id);
+    });
+  }
+  function banner(){
+    const s=getTripSettings();
+    if(document.getElementById("currentTripLabel"))document.getElementById("currentTripLabel").textContent=s.name;
+    if(document.getElementById("currentTripMeta"))document.getElementById("currentTripMeta").textContent=[s.city,s.country,s.currency].filter(Boolean).join(" · ");
+  }
+  function loadSettings(){
+    const s=getTripSettings();
+    const map={tripName:s.name,tripCity:s.city,tripCountry:s.country,tripTimezone:s.timezone,tripCurrency:s.currency,tripStart:s.start,tripEnd:s.end};
+    Object.entries(map).forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.value=v||""});
+  }
+  function loadFields(){document.querySelectorAll("[data-travel-store]").forEach(e=>e.value=localStorage.getItem(tripKey(e.dataset.travelStore))||"")}
+  function saveFields(){document.querySelectorAll("[data-travel-store]").forEach(e=>localStorage.setItem(tripKey(e.dataset.travelStore),e.value));alert("현재 여행에 저장했습니다.")}
+  const getExpenses=()=>{try{return JSON.parse(localStorage.getItem(tripKey("expenses"))||"[]")}catch{return[]}};
+  const setExpenses=v=>localStorage.setItem(tripKey("expenses"),JSON.stringify(v));
+  function renderExpenses(){
+    const list=getExpenses(),box=document.getElementById("expenseList"),sum=document.getElementById("expenseSummary");if(!box||!sum)return;
+    const total=list.reduce((a,x)=>a+(Number(x.krw)||0),0);sum.textContent=`현재 여행 지출 ${list.length}건 · 약 ${Math.round(total).toLocaleString()}원`;
+    box.innerHTML=list.map((x,i)=>`<div class="expense-row"><div><b>${esc(x.title)}</b><div class="muted">${x.amount} ${x.currency}</div></div><div><b>${Math.round(x.krw).toLocaleString()}원</b> <button class="secondary" data-expense-delete="${i}">삭제</button></div></div>`).join("");
+    box.querySelectorAll("[data-expense-delete]").forEach(b=>b.onclick=()=>{const v=getExpenses();v.splice(Number(b.dataset.expenseDelete),1);setExpenses(v);renderExpenses()});
+  }
+  function refreshAll(){renderSwitcher();renderTrips();banner();loadSettings();loadFields();renderExpenses()}
+
+  function openEditor(id=""){
+    const t=id?loadTrips().find(x=>x.id===id):{id:"",name:"",city:"",country:"",timezone:"",currency:"",start:"",end:"",color:"#0a8791"};
+    editTripId.value=t?.id||"";editTripName.value=t?.name||"";editTripCity.value=t?.city||"";editTripCountry.value=t?.country||"";editTripTimezone.value=t?.timezone||"";editTripCurrency.value=t?.currency||"";editTripStart.value=t?.start||"";editTripEnd.value=t?.end||"";editTripColor.value=t?.color||"#0a8791";
+    tripEditorTitle.textContent=id?"여행 수정":"새 여행 만들기";tripEditorCard.classList.remove("hidden");tripEditorCard.scrollIntoView({behavior:"smooth"});
+  }
+  const closeEditor=()=>tripEditorCard.classList.add("hidden");
+  function saveEditor(){
+    const id=editTripId.value||uid();
+    const trip={id,name:editTripName.value.trim(),city:editTripCity.value.trim(),country:editTripCountry.value.trim(),timezone:editTripTimezone.value.trim(),currency:editTripCurrency.value.trim().toUpperCase(),start:editTripStart.value,end:editTripEnd.value,color:editTripColor.value||"#0a8791"};
+    if(!trip.name)return alert("여행 이름을 입력하세요.");
+    if(!trip.timezone)return alert("시간대를 입력하세요. 예: Asia/Tokyo");
+    const trips=loadTrips(),i=trips.findIndex(t=>t.id===id);if(i>=0)trips[i]={...trips[i],...trip};else trips.unshift(trip);
+    saveTrips(trips);localStorage.setItem(ROOT_KEY+"_active",id);closeEditor();refreshAll();alert("여행을 저장하고 현재 여행으로 설정했습니다.");
+  }
+  function duplicateTrip(id){const trips=loadTrips(),src=trips.find(t=>t.id===id);if(!src)return;trips.unshift({...src,id:uid(),name:src.name+" 복사본"});saveTrips(trips);renderTrips()}
+  function deleteTrip(id){const trips=loadTrips(),t=trips.find(x=>x.id===id);if(!t||!confirm(`"${t.name}" 여행을 삭제할까요?`))return;const next=trips.filter(x=>x.id!==id);saveTrips(next);if(activeId()===id)localStorage.setItem(ROOT_KEY+"_active",next[0].id);refreshAll()}
+
+  quickTripSwitcher?.addEventListener("change",e=>setActive(e.target.value));
+  newTripBtn?.addEventListener("click",()=>openEditor());
+  closeTripEditorBtn?.addEventListener("click",closeEditor);
+  cancelTripBtn?.addEventListener("click",closeEditor);
+  saveTripBtn?.addEventListener("click",saveEditor);
+
+  saveTripSettings?.addEventListener("click",()=>{
+    const trips=loadTrips(),id=activeId(),i=trips.findIndex(t=>t.id===id);if(i<0)return;
+    trips[i]={...trips[i],name:tripName.value.trim(),city:tripCity.value.trim(),country:tripCountry.value.trim(),timezone:tripTimezone.value.trim(),currency:tripCurrency.value.trim().toUpperCase(),start:tripStart.value,end:tripEnd.value};
+    saveTrips(trips);refreshAll();alert("현재 여행 설정을 저장했습니다.");
+  });
+
+  saveWalletBtn?.addEventListener("click",saveFields);
+  saveEmergencyBtn?.addEventListener("click",saveFields);
+  addExpenseBtn?.addEventListener("click",()=>{
+    const title=expenseTitle.value.trim(),amount=Number(expenseAmount.value||0),currency=expenseCurrency.value.trim().toUpperCase(),rate=Number(expenseRate.value||0);
+    if(!title||!amount)return alert("항목과 금액을 입력하세요.");
+    const v=getExpenses();v.unshift({title,amount,currency,krw:amount*rate});setExpenses(v);renderExpenses();
+  });
+
+  const emergencyData={"United States":{police:"911",ambulance:"911"},"Japan":{police:"110",ambulance:"119"},"France":{police:"17",ambulance:"15 또는 112"},"United Kingdom":{police:"999 또는 112",ambulance:"999 또는 112"}};
+  document.querySelectorAll("[data-emergency]").forEach(b=>b.onclick=()=>{const s=getTripSettings(),d=emergencyData[s.country]||{};emergencyResult.textContent=d[b.dataset.emergency]||`${s.country}의 긴급 정보는 확인이 필요합니다.`});
+
+  refreshAll();
 })();
 </script>
 
