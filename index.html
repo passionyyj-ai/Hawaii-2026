@@ -351,7 +351,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
 </head>
 <body>
 <input class="day-radio" type="radio" name="day" id="day0" checked><input class="day-radio" type="radio" name="day" id="day1"><input class="day-radio" type="radio" name="day" id="day2"><input class="day-radio" type="radio" name="day" id="day3"><input class="day-radio" type="radio" name="day" id="day4"><input class="day-radio" type="radio" name="day" id="day5"><input class="day-radio" type="radio" name="day" id="day6"><input class="day-radio" type="radio" name="day" id="day7"><input class="day-radio" type="radio" name="day" id="day8">
-<div class="app"><div class="version-banner">✅ TravelMate AI v19.0 · 안정 업데이트 · 일정 상세 · 첨부파일</div>
+<div class="app"><div class="version-banner">✅ TravelMate AI v19.1 · 안정 업데이트 · 일정 상세 · 첨부파일</div>
 <header class="hero">
   <div class="eyebrow">MY TRIP AGENT</div>
   <h1>🌺 TravelMate AI</h1>
@@ -451,7 +451,6 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>8개 일정</span>
       </div>
-      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_0_0">
           <div class="dot"></div>
@@ -551,7 +550,6 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>7개 일정</span>
       </div>
-      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_1_0">
           <div class="dot"></div>
@@ -640,7 +638,6 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>6개 일정</span>
       </div>
-      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_2_0">
           <div class="dot"></div>
@@ -718,7 +715,6 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>8개 일정</span>
       </div>
-      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_3_0">
           <div class="dot"></div>
@@ -818,7 +814,6 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>6개 일정</span>
       </div>
-      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_4_0">
           <div class="dot"></div>
@@ -896,7 +891,6 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>5개 일정</span>
       </div>
-      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_5_0">
           <div class="dot"></div>
@@ -963,7 +957,6 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>9개 일정</span>
       </div>
-      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_6_0">
           <div class="dot"></div>
@@ -1074,7 +1067,6 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>9개 일정</span>
       </div>
-      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_7_0">
           <div class="dot"></div>
@@ -1185,7 +1177,6 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>6개 일정</span>
       </div>
-      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_8_0">
           <div class="dot"></div>
@@ -1282,6 +1273,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
       <div class="label">🇺🇸 영어 번역</div>
       <div id="freeTranslationResult" class="text"></div>
     </div>
+      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
     <div class="inline-actions">
       <button id="openTranslate" class="btn" type="button">앱에서 영어로 번역</button>
       <button id="speakKorean" class="btn secondary" type="button">한국어 읽기</button>
@@ -2970,13 +2962,32 @@ renderCategories();renderPhrases();
 
 
 <script>
-/* TravelMate AI v19.0 — 새로고침 루프 제거 + 일정 상세/첨부파일 */
+/* TravelMate AI v19.1 — 새로고침 루프 제거 + 일정 상세/첨부파일 */
 (function(){
-  const APP_VERSION='19.0';
+  const APP_VERSION='19.1';
   const DB_NAME='travelmate_v18_data';
   const FILE_STORE='files';
   const DETAIL_STORE='details';
   const MAX_FILE_SIZE=20*1024*1024;
+  const CLOUD_KEY='travelmate_v19_cloud_config';
+  const cloudCfg=()=>{try{return JSON.parse(localStorage.getItem(CLOUD_KEY)||'{}')}catch{return {}}};
+  const cloudReady=()=>{const c=cloudCfg();return !!(c.url&&c.anonKey&&c.shareCode)};
+  async function cloudFetch(path,opt={}){
+    const c=cloudCfg(); if(!cloudReady()) throw new Error('클라우드 설정이 필요합니다.');
+    const headers={apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,...(opt.headers||{})};
+    const r=await fetch(c.url.replace(/\/$/,'')+path,{...opt,headers});
+    if(!r.ok) throw new Error((await r.text())||('HTTP '+r.status));
+    if(r.status===204)return null; const t=await r.text(); return t?JSON.parse(t):null;
+  }
+  function setupCloud(){
+    const old=cloudCfg();
+    const url=prompt('Supabase Project URL',old.url||'https://fjpczzjrzxsyqolwfebh.supabase.co'); if(url===null)return;
+    const anonKey=prompt('Supabase anon public key',old.anonKey||''); if(anonKey===null)return;
+    const shareCode=prompt('가족과 함께 사용할 공유 코드',old.shareCode||'HAWAII2026'); if(shareCode===null)return;
+    localStorage.setItem(CLOUD_KEY,JSON.stringify({url:url.trim(),anonKey:anonKey.trim(),shareCode:shareCode.trim()}));
+    alert('클라우드 설정을 저장했습니다. 같은 URL·키·공유 코드를 다른 휴대폰에도 입력하세요.');
+    location.reload();
+  }
   let dbPromise, activeCard=null, refreshing=false;
 
   // 안정형 업데이트: 자동 새로고침, controllerchange, skipWaiting을 사용하지 않습니다.
@@ -3016,17 +3027,32 @@ renderCategories();renderPhrases();
     });
     return dbPromise;
   }
-  async function getDetails(key){const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction(DETAIL_STORE).objectStore(DETAIL_STORE).get(key);r.onsuccess=()=>res(r.result||{scheduleKey:key,memo:'',reservation:'',phone:'',url:''});r.onerror=()=>rej(r.error)})}
-  async function saveDetails(item){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(DETAIL_STORE,'readwrite');tx.objectStore(DETAIL_STORE).put({...item,updatedAt:Date.now()});tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})}
-  async function listFiles(key){const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction(FILE_STORE).objectStore(FILE_STORE).index('scheduleKey').getAll(key);r.onsuccess=()=>res((r.result||[]).sort((a,b)=>b.updatedAt-a.updatedAt));r.onerror=()=>rej(r.error)})}
-  async function addFile(key,file){const db=await openDB();const item={id:key+'_'+Date.now()+'_'+Math.random().toString(36).slice(2),scheduleKey:key,name:file.name,type:file.type||'application/octet-stream',size:file.size,updatedAt:Date.now(),blob:file};return new Promise((res,rej)=>{const tx=db.transaction(FILE_STORE,'readwrite');tx.objectStore(FILE_STORE).put(item);tx.oncomplete=()=>res(item);tx.onerror=()=>rej(tx.error)})}
-  async function deleteFile(id){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(FILE_STORE,'readwrite');tx.objectStore(FILE_STORE).delete(id);tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})}
+  async function getDetails(key){
+    if(cloudReady()){const c=cloudCfg();const rows=await cloudFetch('/rest/v1/travelmate_details?share_code=eq.'+encodeURIComponent(c.shareCode)+'&schedule_key=eq.'+encodeURIComponent(key)+'&select=*');const x=rows?.[0];return x?{scheduleKey:key,memo:x.memo||'',reservation:x.reservation||'',phone:x.phone||'',url:x.url||''}:{scheduleKey:key,memo:'',reservation:'',phone:'',url:''}}
+    const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction(DETAIL_STORE).objectStore(DETAIL_STORE).get(key);r.onsuccess=()=>res(r.result||{scheduleKey:key,memo:'',reservation:'',phone:'',url:''});r.onerror=()=>rej(r.error)})
+  }
+  async function saveDetails(item){
+    if(cloudReady()){const c=cloudCfg();return cloudFetch('/rest/v1/travelmate_details',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({share_code:c.shareCode,schedule_key:item.scheduleKey,memo:item.memo,reservation:item.reservation,phone:item.phone,url:item.url,updated_at:new Date().toISOString()})})}
+    const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(DETAIL_STORE,'readwrite');tx.objectStore(DETAIL_STORE).put({...item,updatedAt:Date.now()});tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})
+  }
+  async function listFiles(key){
+    if(cloudReady()){const c=cloudCfg();const rows=await cloudFetch('/rest/v1/travelmate_attachments?share_code=eq.'+encodeURIComponent(c.shareCode)+'&schedule_key=eq.'+encodeURIComponent(key)+'&select=*&order=created_at.desc');return (rows||[]).map(x=>({id:x.id,scheduleKey:key,name:x.file_name,type:x.mime_type||'',size:x.file_size||0,updatedAt:new Date(x.created_at).getTime(),url:c.url.replace(/\/$/,'')+'/storage/v1/object/public/travelmate-files/'+x.storage_path,storagePath:x.storage_path}))}
+    const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction(FILE_STORE).objectStore(FILE_STORE).index('scheduleKey').getAll(key);r.onsuccess=()=>res((r.result||[]).sort((a,b)=>b.updatedAt-a.updatedAt));r.onerror=()=>rej(r.error)})
+  }
+  async function addFile(key,file){
+    if(cloudReady()){const c=cloudCfg();const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const path=encodeURIComponent(c.shareCode)+'/'+encodeURIComponent(key)+'/'+Date.now()+'_'+safe;const r=await fetch(c.url.replace(/\/$/,'')+'/storage/v1/object/travelmate-files/'+path,{method:'POST',headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,'Content-Type':file.type||'application/octet-stream','x-upsert':'false'},body:file});if(!r.ok)throw new Error(await r.text());const meta=await cloudFetch('/rest/v1/travelmate_attachments',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify({share_code:c.shareCode,schedule_key:key,file_name:file.name,mime_type:file.type||'application/octet-stream',file_size:file.size,storage_path:decodeURIComponent(path)})});return meta?.[0]}
+    const db=await openDB();const item={id:key+'_'+Date.now()+'_'+Math.random().toString(36).slice(2),scheduleKey:key,name:file.name,type:file.type||'application/octet-stream',size:file.size,updatedAt:Date.now(),blob:file};return new Promise((res,rej)=>{const tx=db.transaction(FILE_STORE,'readwrite');tx.objectStore(FILE_STORE).put(item);tx.oncomplete=()=>res(item);tx.onerror=()=>rej(tx.error)})
+  }
+  async function deleteFile(id){
+    if(cloudReady()){const c=cloudCfg();const rows=await cloudFetch('/rest/v1/travelmate_attachments?id=eq.'+encodeURIComponent(id)+'&select=storage_path');const path=rows?.[0]?.storage_path;if(path){const r=await fetch(c.url.replace(/\/$/,'')+'/storage/v1/object/travelmate-files/'+path.split('/').map(encodeURIComponent).join('/'),{method:'DELETE',headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}});if(!r.ok)console.warn(await r.text())}return cloudFetch('/rest/v1/travelmate_attachments?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:{Prefer:'return=minimal'}})}
+    const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(FILE_STORE,'readwrite');tx.objectStore(FILE_STORE).delete(id);tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})
+  }
   const esc=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const size=n=>n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(1)+' MB';
 
   function ensureModal(){
     if(document.getElementById('v18ModalBackdrop'))return;
-    const wrap=document.createElement('div');wrap.id='v18ModalBackdrop';wrap.className='v18-modal-backdrop';wrap.innerHTML=`<div class="v18-modal" role="dialog" aria-modal="true"><div class="v18-modal-head"><div><h2 class="v18-modal-title" id="v18Title">일정 상세</h2><div class="v18-modal-sub" id="v18Sub"></div></div><button class="btn ghost v18-close" type="button" aria-label="닫기">✕</button></div><section class="v18-section"><h3>📝 일정 정보</h3><div class="v18-field"><label>예약번호</label><input id="v18Reservation" placeholder="예: ABC12345"></div><div class="v18-field"><label>연락처</label><input id="v18Phone" placeholder="호텔·렌터카·식당 연락처"></div><div class="v18-field"><label>홈페이지 또는 바우처 링크</label><input id="v18Url" type="url" placeholder="https://..."></div><div class="v18-field"><label>메모</label><textarea id="v18Memo" placeholder="준비물, 주차 위치, 확인사항 등을 기록하세요."></textarea></div><div class="v18-save-row"><button id="v18Save" class="btn primary" type="button">저장</button><button id="v18OpenUrl" class="btn ghost" type="button">링크 열기</button></div></section><section class="v18-section"><h3>📎 첨부파일 <span id="v18Count" class="pill">0개</span></h3><label class="btn secondary v18-upload">파일 추가<input id="v18FileInput" type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,text/plain"></label><div class="v18-sync-note">첨부파일은 이 기기의 앱 저장공간에 보관됩니다. 앱 업데이트 후에도 유지되지만 다른 휴대폰과 자동 동기화되지는 않습니다.</div><div id="v18Files" class="v18-file-list"></div></section></div>`;
+    const wrap=document.createElement('div');wrap.id='v18ModalBackdrop';wrap.className='v18-modal-backdrop';wrap.innerHTML=`<div class="v18-modal" role="dialog" aria-modal="true"><div class="v18-modal-head"><div><h2 class="v18-modal-title" id="v18Title">일정 상세</h2><div class="v18-modal-sub" id="v18Sub"></div></div><button class="btn ghost v18-close" type="button" aria-label="닫기">✕</button></div><section class="v18-section"><h3>📝 일정 정보</h3><div class="v18-field"><label>예약번호</label><input id="v18Reservation" placeholder="예: ABC12345"></div><div class="v18-field"><label>연락처</label><input id="v18Phone" placeholder="호텔·렌터카·식당 연락처"></div><div class="v18-field"><label>홈페이지 또는 바우처 링크</label><input id="v18Url" type="url" placeholder="https://..."></div><div class="v18-field"><label>메모</label><textarea id="v18Memo" placeholder="준비물, 주차 위치, 확인사항 등을 기록하세요."></textarea></div><div class="v18-save-row"><button id="v18Save" class="btn primary" type="button">저장</button><button id="v18OpenUrl" class="btn ghost" type="button">링크 열기</button></div></section><section class="v18-section"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px"><b id="v19CloudStatus">☁️ 클라우드 상태 확인 중</b><button id="v19CloudSetup" class="btn ghost" type="button">클라우드 설정</button></div><h3>📎 첨부파일 <span id="v18Count" class="pill">0개</span></h3><label class="btn secondary v18-upload">파일 추가<input id="v18FileInput" type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,text/plain"></label><div class="v18-sync-note">클라우드 설정 시 아이폰·갤럭시·PC에서 같은 첨부파일을 확인합니다. 설정 전에는 이 기기에만 저장됩니다.</div><div id="v18Files" class="v18-file-list"></div></section></div>`;
     document.body.appendChild(wrap);
     const close=()=>{wrap.classList.remove('show');activeCard=null};
     wrap.querySelector('.v18-close').onclick=close;wrap.addEventListener('click',e=>{if(e.target===wrap)close()});
@@ -3034,6 +3060,8 @@ renderCategories();renderPhrases();
     document.getElementById('v18Save').onclick=saveActive;
     document.getElementById('v18OpenUrl').onclick=()=>{const u=document.getElementById('v18Url').value.trim();if(!u)return alert('링크를 먼저 입력해 주세요.');window.open(/^https?:\/\//i.test(u)?u:'https://'+u,'_blank','noopener')};
     document.getElementById('v18FileInput').addEventListener('change',uploadActive);
+    document.getElementById('v19CloudSetup').onclick=setupCloud;
+    document.getElementById('v19CloudStatus').textContent=cloudReady()?'☁️ 클라우드 공유 사용 중':'📱 이 기기에만 저장 중';
   }
   async function updateBadge(card){const files=await listFiles(card.dataset.doneKey);const b=card.querySelector('.file-badge');if(b)b.textContent=files.length}
   async function openDetail(card){
@@ -3051,15 +3079,15 @@ renderCategories();renderPhrases();
     wrap=document.createElement('div');wrap.id='v18PreviewBackdrop';wrap.className='v18-preview-backdrop';
     wrap.innerHTML=`<div class="v18-preview" role="dialog" aria-modal="true"><div class="v18-preview-head"><div id="v18PreviewTitle" class="v18-preview-title">첨부파일</div><button id="v18PreviewClose" class="btn ghost" type="button">✕ 닫기</button></div><div id="v18PreviewBody" class="v18-preview-body"></div><div class="v18-preview-actions"><button id="v18PreviewNewTab" class="btn secondary" type="button">새 창에서 열기</button><button id="v18PreviewDownload" class="btn ghost" type="button">파일 저장</button></div></div>`;
     document.body.appendChild(wrap);
-    const close=()=>{wrap.classList.remove('show');document.getElementById('v18PreviewBody').innerHTML='';if(previewObjectUrl){URL.revokeObjectURL(previewObjectUrl);previewObjectUrl=null}};
+    const close=()=>{wrap.classList.remove('show');document.getElementById('v18PreviewBody').innerHTML='';if(previewObjectUrl&&previewObjectUrl.startsWith('blob:'))URL.revokeObjectURL(previewObjectUrl);previewObjectUrl=null};
     document.getElementById('v18PreviewClose').onclick=close;wrap.addEventListener('click',e=>{if(e.target===wrap)close()});
     return wrap;
   }
   function triggerDownload(url,name){const a=document.createElement('a');a.href=url;a.download=name||'attachment';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()}
   function openFilePreview(f){
     const wrap=ensurePreview();
-    if(previewObjectUrl)URL.revokeObjectURL(previewObjectUrl);
-    previewObjectUrl=URL.createObjectURL(f.blob);
+    if(previewObjectUrl&&previewObjectUrl.startsWith('blob:'))URL.revokeObjectURL(previewObjectUrl);
+    previewObjectUrl=f.url||URL.createObjectURL(f.blob);
     document.getElementById('v18PreviewTitle').textContent=f.name;
     const body=document.getElementById('v18PreviewBody');
     if((f.type||'').startsWith('image/')) body.innerHTML=`<img alt="${esc(f.name)}">`,body.querySelector('img').src=previewObjectUrl;
@@ -3095,7 +3123,7 @@ renderCategories();renderPhrases();
 
 
 <script>
-/* TravelMate AI v19.0 — 일정 추가·수정·삭제 */
+/* TravelMate AI v19.1 — 일정 추가·수정·삭제 */
 (function(){
   const STORE='travelmate_v19_schedule_changes';
   let editingCard=null, activePanel=null;
@@ -3139,5 +3167,18 @@ renderCategories();renderPhrases();
 })();
 </script>
 
+
+<script>
+/* v19.1 일정 클라우드 동기화 */
+(function(){
+ const STORE='travelmate_v19_schedule_changes',CFG='travelmate_v19_cloud_config';let busy=false,last='';
+ const cfg=()=>{try{return JSON.parse(localStorage.getItem(CFG)||'{}')}catch{return {}}};
+ const ready=()=>{const c=cfg();return c.url&&c.anonKey&&c.shareCode};
+ async function req(path,opt={}){const c=cfg(),r=await fetch(c.url.replace(/\/$/,'')+path,{...opt,headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,...(opt.headers||{})}});if(!r.ok)throw new Error(await r.text());const t=await r.text();return t?JSON.parse(t):null}
+ async function push(){if(!ready()||busy)return;const state=localStorage.getItem(STORE)||'{"custom":[],"edited":{},"deleted":[]}';if(state===last)return;busy=true;try{const c=cfg();await req('/rest/v1/travelmate_shared_state',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({share_code:c.shareCode,state:JSON.parse(state),updated_at:new Date().toISOString()})});last=state}catch(e){console.warn('일정 클라우드 저장 실패',e)}finally{busy=false}}
+ async function pull(){if(!ready()||busy)return;busy=true;try{const c=cfg(),rows=await req('/rest/v1/travelmate_shared_state?share_code=eq.'+encodeURIComponent(c.shareCode)+'&select=state,updated_at');const remote=rows?.[0]?.state;if(remote){const text=JSON.stringify(remote);if(text!==localStorage.getItem(STORE)){localStorage.setItem(STORE,text);last=text;location.reload()}}else await push()}catch(e){console.warn('일정 클라우드 불러오기 실패',e)}finally{busy=false}}
+ window.addEventListener('load',()=>{pull();setInterval(push,2500);setInterval(pull,30000)});
+})();
+</script>
 </body>
 </html>
