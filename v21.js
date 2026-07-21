@@ -7,7 +7,8 @@
 
   const getCfg=()=>{try{return JSON.parse(localStorage.getItem(CFG)||'{}')}catch{return {}}};
   const setCfg=c=>localStorage.setItem(CFG,JSON.stringify(c));
-  const cleanCode=v=>{const raw=String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);return raw.length>4?raw.slice(0,4)+'-'+raw.slice(4):raw};
+  const cleanCode=v=>{const raw=String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);return raw.length>4?raw.slice(0,4)+'-'+raw.slice(4,8):raw};
+  const validCode=v=>/^[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(v);
   const makeCode=()=>{const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let out='';crypto.getRandomValues(new Uint8Array(8)).forEach(n=>out+=chars[n%chars.length]);return out.slice(0,4)+'-'+out.slice(4,8)};
 
   function cloudDefaults(){
@@ -103,7 +104,7 @@
     try{
       const c=currentFromInputs(),code=cleanCode(modal().querySelector('#v20JoinCode').value);
       if(!c.url||!c.anonKey) return alert('먼저 Supabase 연결정보를 입력하세요.');
-      if(code.length<8) return alert('올바른 여행 코드를 입력하세요.');
+      if(!validCode(code)) return alert('여행 코드는 AB3Q-9LXT 형식으로 입력하세요.');
       const rows=await req(c,'/rest/v1/travelmate_trips?trip_code=eq.'+encodeURIComponent(code)+'&select=trip_code,trip_name');
       if(!rows?.length) return alert('여행 코드 '+code+'를 찾지 못했습니다. Supabase에 표시된 코드를 복사해서 붙여 넣어 주세요.');
       setCfg({...c,shareCode:rows[0].trip_code,tripName:rows[0].trip_name});
@@ -154,6 +155,85 @@
     if(c.shareCode!==code) setTimeout(()=>{window.openV20TripCenter();modal().querySelector('#v20JoinCode').value=code},300);
   }
 
+  /* 일정 공유는 이 모듈 한 곳에서만 처리합니다. 원격 변경을 적용한 뒤 같은
+     내용으로 다시 새로고침하지 않도록 세션 서명을 기록합니다. */
+  let syncBusy=false;
+  let lastLocalState='';
+  let lastRemoteUpdated='';
+  const SYNC_GUARD='travelmate_v21_last_remote_state';
+  const readLocalState=()=>localStorage.getItem(STATE)||'{"custom":[],"edited":{},"deleted":[],"order":{}}';
+  async function pushScheduleState(){
+    const c=cloudDefaults();
+    if(!c.url||!c.anonKey||!c.shareCode||syncBusy)return;
+    const text=readLocalState();
+    syncBusy=true;
+    try{
+      const updated=new Date().toISOString();
+      await req(c,'/rest/v1/travelmate_shared_state',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({share_code:c.shareCode,state:JSON.parse(text),updated_at:updated})});
+      lastLocalState=text;lastRemoteUpdated=updated;
+    }catch(e){console.warn('TravelMate 일정 저장 실패',e)}finally{syncBusy=false}
+  }
+  async function pullScheduleState(initial=false){
+    const c=cloudDefaults();
+    if(!c.url||!c.anonKey||!c.shareCode||syncBusy)return;
+    syncBusy=true;
+    try{
+      const rows=await req(c,'/rest/v1/travelmate_shared_state?share_code=eq.'+encodeURIComponent(c.shareCode)+'&select=state,updated_at');
+      const row=rows?.[0];
+      if(!row){syncBusy=false;await pushScheduleState();return}
+      const remoteText=JSON.stringify(row.state||{}),localText=readLocalState();
+      if(row.updated_at===lastRemoteUpdated)return;
+      lastRemoteUpdated=row.updated_at||'';
+      if(remoteText!==localText){
+        const localChanged=lastLocalState&&localText!==lastLocalState;
+        if(!initial&&localChanged){syncBusy=false;await pushScheduleState();return}
+        localStorage.setItem(STATE,remoteText);lastLocalState=remoteText;
+        const guard=c.shareCode+':'+remoteText;
+        if(sessionStorage.getItem(SYNC_GUARD)!==guard){sessionStorage.setItem(SYNC_GUARD,guard);location.reload()}
+      }else lastLocalState=localText;
+    }catch(e){console.warn('TravelMate 일정 불러오기 실패',e)}finally{syncBusy=false}
+  }
+  function startScheduleSync(){
+    const c=cloudDefaults();if(!c.url||!c.anonKey||!c.shareCode)return;
+    lastLocalState=readLocalState();
+    pullScheduleState(true);
+    setInterval(()=>{const now=readLocalState();if(now!==lastLocalState)pushScheduleState()},3000);
+    setInterval(()=>pullScheduleState(false),20000);
+  }
+
+  /* iPhone Safari/PWA 안정성 우선 음성 인식.
+     한 번의 클릭에 한 세션만 만들며 자동 재시작과 getUserMedia 사전 점유를 하지 않습니다. */
+  function installStableSpeech(){
+    const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+    const support=document.getElementById('interpreterSupport');
+    const bindings=[
+      {button:document.getElementById('listenEnglishBtn'),target:document.getElementById('heardEnglish'),lang:'en-US',label:'🎤 영어 듣기'},
+      {button:document.getElementById('listenKoreanBtn'),target:document.getElementById('spokenKorean'),lang:'ko-KR',label:'🎤 한국어 말하기'}
+    ];
+    let current=null,sequence=0;
+    const reset=s=>{if(!s)return;clearTimeout(s.timer);s.button.classList.remove('listening');s.button.disabled=false;s.button.textContent=s.label;if(current===s)current=null};
+    const stop=()=>{if(!current)return;const s=current;s.intentional=true;try{s.rec.abort()}catch{}reset(s)};
+    function begin(item){
+      if(!Recognition){item.target.textContent='이 브라우저에서는 음성 인식을 지원하지 않습니다. 키보드 받아쓰기를 이용해 주세요.';return}
+      if(current){if(current.button===item.button){stop();return}stop()}
+      try{window.speechSynthesis?.cancel()}catch{}
+      const rec=new Recognition(),id=++sequence;
+      const s={...item,rec,id,label:item.label,intentional:false,started:false,result:'',error:'',timer:0};current=s;
+      rec.lang=item.lang;rec.continuous=false;rec.interimResults=false;rec.maxAlternatives=1;
+      rec.onstart=()=>{if(current?.id!==id)return;s.started=true;s.target.textContent='듣고 있습니다…';if(support)support.textContent='🎙️ 마이크가 켜졌습니다. 지금 말해 주세요.'};
+      rec.onresult=e=>{if(current?.id!==id)return;let text='';for(let i=e.resultIndex;i<e.results.length;i++)text+=(text?' ':'')+(e.results[i][0]?.transcript||'').trim();s.result=text.trim();if(s.result)s.target.textContent=s.result};
+      rec.onerror=e=>{if(current?.id!==id)return;s.error=e.error||'unknown';if(s.intentional||s.error==='aborted')return;const messages={'not-allowed':'마이크 권한이 차단되었습니다. Safari 사이트 설정에서 마이크를 허용해 주세요.','service-not-allowed':'Safari 음성 인식 서비스를 사용할 수 없습니다. 일반 Safari 탭에서도 확인해 주세요.','audio-capture':'마이크를 사용할 수 없습니다. 통화나 녹음 앱을 종료한 뒤 다시 시도해 주세요.','no-speech':'음성이 감지되지 않았습니다. 버튼을 다시 누른 뒤 바로 말해 주세요.','network':'음성 인식 서버에 연결하지 못했습니다. 네트워크를 확인해 주세요.'};s.target.textContent=messages[s.error]||('음성 인식 오류: '+s.error);if(support)support.textContent='⚠️ '+s.target.textContent};
+      rec.onend=()=>{if(current?.id!==id)return;if(s.result){s.target.textContent=s.result;s.target.dispatchEvent(new Event('input',{bubbles:true}));if(support)support.textContent='✅ 음성 인식이 완료되었습니다.'}else if(!s.error&&!s.intentional){s.target.textContent=s.started?'음성이 감지되지 않았습니다. 다시 눌러 주세요.':'음성 인식을 시작하지 못했습니다. 잠시 후 다시 눌러 주세요.'}reset(s)};
+      item.button.classList.add('listening');item.button.textContent='■ 듣기 중지';item.target.textContent='마이크를 시작하고 있습니다…';
+      try{rec.start()}catch(e){item.target.textContent='음성 인식을 시작하지 못했습니다. 잠시 후 다시 눌러 주세요.';if(support)support.textContent='⚠️ 시작 실패: '+(e.name||'unknown');reset(s);return}
+      s.timer=setTimeout(()=>{if(current?.id!==id||s.started)return;s.intentional=true;try{rec.abort()}catch{}item.target.textContent='음성 인식 시작 시간이 초과되었습니다. 다시 눌러 주세요.';reset(s)},8000);
+    }
+    bindings.forEach(item=>item.button?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();begin(item)},true));
+    document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});window.addEventListener('pagehide',stop);
+    if(support)support.textContent=Recognition?'✅ 음성 인식 준비됨 · 버튼을 누른 직후 말해 주세요.':'⚠️ 음성 인식 미지원 · 키보드 받아쓰기를 이용해 주세요.';
+  }
+
   window.openV20TripCenter=()=>{fill();modal().classList.add('show')};
-  window.addEventListener('DOMContentLoaded',()=>{document.getElementById('v20TripButton')?.addEventListener('click',window.openV20TripCenter);autoJoin()});
+  window.addEventListener('DOMContentLoaded',()=>{document.getElementById('v20TripButton')?.addEventListener('click',window.openV20TripCenter);autoJoin();startScheduleSync()});
+  installStableSpeech();
 })();

@@ -3149,7 +3149,7 @@ renderCategories();renderPhrases();
     const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(DETAIL_STORE,'readwrite');tx.objectStore(DETAIL_STORE).put({...item,updatedAt:Date.now()});tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})
   }
   async function listFiles(key){
-    if(cloudReady()){const c=cloudCfg();const rows=await cloudFetch('/rest/v1/travelmate_attachments?share_code=eq.'+encodeURIComponent(c.shareCode)+'&schedule_key=eq.'+encodeURIComponent(key)+'&select=*&order=created_at.desc');return (rows||[]).map(x=>({id:x.id,scheduleKey:key,name:x.file_name,type:x.mime_type||'',size:x.file_size||0,updatedAt:new Date(x.created_at).getTime(),url:c.url.replace(/\/$/,'')+'/storage/v1/object/public/travelmate-files/'+x.storage_path,storagePath:x.storage_path}))}
+    if(cloudReady()){const c=cloudCfg();const rows=await cloudFetch('/rest/v1/travelmate_attachments?share_code=eq.'+encodeURIComponent(c.shareCode)+'&schedule_key=eq.'+encodeURIComponent(key)+'&select=*&order=created_at.desc');return (rows||[]).map(x=>({id:x.id,scheduleKey:key,name:x.file_name,type:x.mime_type||'',size:x.file_size||0,updatedAt:new Date(x.created_at).getTime(),url:c.url.replace(/\/$/,'')+'/storage/v1/object/public/travelmate-files/'+x.storage_path.split('/').map(encodeURIComponent).join('/'),storagePath:x.storage_path}))}
     const db=await openDB();return new Promise((res,rej)=>{const r=db.transaction(FILE_STORE).objectStore(FILE_STORE).index('scheduleKey').getAll(key);r.onsuccess=()=>res((r.result||[]).sort((a,b)=>b.updatedAt-a.updatedAt));r.onerror=()=>rej(r.error)})
   }
   async function addFile(key,file){
@@ -3157,7 +3157,7 @@ renderCategories();renderPhrases();
     const db=await openDB();const item={id:key+'_'+Date.now()+'_'+Math.random().toString(36).slice(2),scheduleKey:key,name:file.name,type:file.type||'application/octet-stream',size:file.size,updatedAt:Date.now(),blob:file};return new Promise((res,rej)=>{const tx=db.transaction(FILE_STORE,'readwrite');tx.objectStore(FILE_STORE).put(item);tx.oncomplete=()=>res(item);tx.onerror=()=>rej(tx.error)})
   }
   async function deleteFile(id){
-    if(cloudReady()){const c=cloudCfg();const rows=await cloudFetch('/rest/v1/travelmate_attachments?id=eq.'+encodeURIComponent(id)+'&select=storage_path');const path=rows?.[0]?.storage_path;if(path){const r=await fetch(c.url.replace(/\/$/,'')+'/storage/v1/object/travelmate-files/'+path.split('/').map(encodeURIComponent).join('/'),{method:'DELETE',headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}});if(!r.ok)console.warn(await r.text())}return cloudFetch('/rest/v1/travelmate_attachments?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:{Prefer:'return=minimal'}})}
+    if(cloudReady()){const c=cloudCfg();const scope='?id=eq.'+encodeURIComponent(id)+'&share_code=eq.'+encodeURIComponent(c.shareCode);const rows=await cloudFetch('/rest/v1/travelmate_attachments'+scope+'&select=storage_path');const path=rows?.[0]?.storage_path;if(path){const r=await fetch(c.url.replace(/\/$/,'')+'/storage/v1/object/travelmate-files/'+path.split('/').map(encodeURIComponent).join('/'),{method:'DELETE',headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}});if(!r.ok)throw new Error(await r.text())}return cloudFetch('/rest/v1/travelmate_attachments'+scope,{method:'DELETE',headers:{Prefer:'return=minimal'}})}
     const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(FILE_STORE,'readwrite');tx.objectStore(FILE_STORE).delete(id);tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})
   }
   const esc=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -3301,8 +3301,8 @@ renderCategories();renderPhrases();
  async function req(path,opt={}){const c=cfg(),r=await fetch(c.url.replace(/\/$/,'')+path,{...opt,headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,...(opt.headers||{})}});if(!r.ok)throw new Error(await r.text());const t=await r.text();return t?JSON.parse(t):null}
  async function push(){if(!ready()||busy)return;const state=localStorage.getItem(STORE)||'{"custom":[],"edited":{},"deleted":[]}';if(state===last)return;busy=true;try{const c=cfg();await req('/rest/v1/travelmate_shared_state',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({share_code:c.shareCode,state:JSON.parse(state),updated_at:new Date().toISOString()})});last=state}catch(e){console.warn('일정 클라우드 저장 실패',e)}finally{busy=false}}
  async function pull(){if(!ready()||busy)return;busy=true;try{const c=cfg(),rows=await req('/rest/v1/travelmate_shared_state?share_code=eq.'+encodeURIComponent(c.shareCode)+'&select=state,updated_at');const remote=rows?.[0]?.state;if(remote){const text=JSON.stringify(remote);if(text!==localStorage.getItem(STORE)){localStorage.setItem(STORE,text);last=text;location.reload()}}else await push()}catch(e){console.warn('일정 클라우드 불러오기 실패',e)}finally{busy=false}}
- window.addEventListener('load',()=>{pull();setInterval(push,2500);setInterval(pull,30000)});
+ // v21.js가 충돌 방지·버전 비교를 포함한 일정 동기화를 전담합니다.
 })();
 </script>
-<script src="./v21.js?v=22.2-beta"></script></body>
+<script src="./v21.js?v=21.0-stable"></script></body>
 </html>
