@@ -2198,7 +2198,7 @@ if("serviceWorker" in navigator){
 
 
 <script>
-/* v11 양방향 통역 */
+/* v17.2 모바일 Safari/Chrome 음성 인식 안정화 */
 (function(){
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const support = document.getElementById("interpreterSupport");
@@ -2209,6 +2209,10 @@ if("serviceWorker" in navigator){
 
   let activeRecognition = null;
   let activeButton = null;
+  let activeSession = 0;
+  let isStarting = false;
+  let expectedAbort = false;
+  let restartTimer = null;
 
   function getLog(){
     try{return JSON.parse(localStorage.getItem(STORE_PREFIX+"interpreter_log")||"[]")}catch(e){return []}
@@ -2232,18 +2236,54 @@ if("serviceWorker" in navigator){
       return `<div class="log-item"><div class="who">${x.who} · ${d.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})}</div><div>${x.text}</div></div>`;
     }).join(""):"기록이 없습니다.";
   }
-  function stopRecognition(){
-    try{activeRecognition?.stop()}catch(e){}
-    if(activeButton) activeButton.classList.remove("listening");
+  function defaultLabel(button){
+    return button===enBtn ? "🎤 영어 듣기" : "🎤 한국어 말하기";
+  }
+  function resetButton(button){
+    if(!button) return;
+    button.classList.remove("listening");
+    button.disabled=false;
+    button.textContent=defaultLabel(button);
+  }
+  function clearActive(session){
+    if(session && session!==activeSession) return;
+    resetButton(activeButton);
     activeRecognition=null;
     activeButton=null;
+    isStarting=false;
+    expectedAbort=false;
   }
-  function listen(lang,target,button,who){
+  function stopRecognition(silent=true){
+    clearTimeout(restartTimer);
+    restartTimer=null;
+    const rec=activeRecognition;
+    const btn=activeButton;
+    if(!rec){resetButton(btn);return Promise.resolve();}
+    expectedAbort=silent;
+    return new Promise(resolve=>{
+      let done=false;
+      const finish=()=>{if(done)return;done=true;resetButton(btn);resolve();};
+      const timer=setTimeout(finish,450);
+      try{
+        rec.addEventListener("end",()=>{clearTimeout(timer);finish();},{once:true});
+        rec.abort();
+      }catch(e){clearTimeout(timer);finish();}
+    });
+  }
+  async function listen(lang,target,button,who){
     if(!SpeechRecognition){
       alert("이 브라우저에서는 음성 인식을 지원하지 않습니다. Google 번역 또는 ChatGPT 음성을 이용해 주세요.");
       return;
     }
-    stopRecognition();
+    if(isStarting) return;
+    isStarting=true;
+
+    // iPhone에서 TTS 재생 중 STT를 시작하면 aborted가 발생할 수 있어 먼저 완전히 중지합니다.
+    try{window.speechSynthesis?.cancel();}catch(e){}
+    await stopRecognition(true);
+    await new Promise(r=>setTimeout(r,220));
+
+    const session=++activeSession;
     const rec=new SpeechRecognition();
     rec.lang=lang;
     rec.interimResults=true;
@@ -2251,40 +2291,56 @@ if("serviceWorker" in navigator){
     rec.maxAlternatives=1;
     activeRecognition=rec;
     activeButton=button;
+    expectedAbort=false;
     let finalText="";
+    let hadUsefulResult=false;
+
     button.classList.add("listening");
+    button.disabled=false;
     button.textContent="⏹ 듣는 중… 다시 누르면 중지";
     target.textContent="듣고 있습니다…";
 
+    rec.onstart=()=>{ if(session===activeSession) isStarting=false; };
     rec.onresult=(event)=>{
+      if(session!==activeSession) return;
       let interim="";
       for(let i=event.resultIndex;i<event.results.length;i++){
         const t=event.results[i][0].transcript;
-        if(event.results[i].isFinal) finalText+=t;
+        if(event.results[i].isFinal){finalText+=t;hadUsefulResult=true;}
         else interim+=t;
       }
       target.textContent=(finalText||interim||"듣고 있습니다…").trim();
     };
     rec.onerror=(event)=>{
+      if(session!==activeSession) return;
+      // 버튼 전환·사용자 중지로 발생한 aborted는 정상 종료이므로 오류로 표시하지 않습니다.
+      if(event.error==="aborted" && expectedAbort) return;
       const msg={
-        "not-allowed":"마이크 사용 권한이 허용되지 않았습니다.",
-        "no-speech":"음성이 들리지 않았습니다. 다시 시도해 주세요.",
-        "network":"음성 인식 네트워크 오류가 발생했습니다.",
-        "audio-capture":"마이크를 사용할 수 없습니다."
+        "not-allowed":"마이크 사용 권한이 허용되지 않았습니다. 브라우저 설정에서 마이크를 허용해 주세요.",
+        "service-not-allowed":"이 브라우저의 음성 인식 서비스가 차단되었습니다.",
+        "no-speech":"음성이 들리지 않았습니다. 버튼을 다시 누르고 말해 주세요.",
+        "network":"음성 인식 네트워크 오류가 발생했습니다. 인터넷 연결을 확인해 주세요.",
+        "audio-capture":"마이크를 사용할 수 없습니다. 다른 앱의 마이크 사용을 종료해 주세요.",
+        "aborted":"음성 인식이 중단되었습니다. 잠시 후 다시 눌러 주세요."
       }[event.error]||("음성 인식 오류: "+event.error);
       target.textContent=msg;
     };
     rec.onend=()=>{
-      button.classList.remove("listening");
-      button.textContent=lang==="en-US"?"🎤 영어 듣기":"🎤 한국어 말하기";
+      if(session!==activeSession) return;
       const text=target.textContent.trim();
-      if(text && !text.includes("듣고") && !text.includes("오류") && !text.includes("권한") && !text.includes("들리지")){
-        addLog(who,text);
-      }
-      activeRecognition=null;
-      activeButton=null;
+      if(hadUsefulResult && text && !text.includes("듣고") && !text.includes("오류") && !text.includes("권한") && !text.includes("들리지")) addLog(who,text);
+      clearActive(session);
     };
-    rec.start();
+
+    try{rec.start();}
+    catch(e){
+      if(session===activeSession){
+        target.textContent="음성 인식을 시작하지 못했습니다. 1초 후 다시 눌러 주세요.";
+        clearActive(session);
+      }
+    }
+    // 일부 모바일 브라우저는 onstart를 누락하므로 잠금이 남지 않게 합니다.
+    setTimeout(()=>{if(session===activeSession)isStarting=false;},900);
   }
 
   if(support){
@@ -2293,22 +2349,22 @@ if("serviceWorker" in navigator){
       :"⚠️ 현재 브라우저에서 음성 인식이 지원되지 않습니다. 아래 Google 번역 또는 ChatGPT 음성을 사용하세요.";
   }
 
-  enBtn?.addEventListener("click",()=>{
-    if(activeRecognition && activeButton===enBtn){stopRecognition();return;}
+  enBtn?.addEventListener("click",async()=>{
+    if(activeRecognition && activeButton===enBtn){await stopRecognition(true);clearActive();return;}
     listen("en-US",enBox,enBtn,"상대방 영어");
   });
-  koBtn?.addEventListener("click",()=>{
-    if(activeRecognition && activeButton===koBtn){stopRecognition();return;}
+  koBtn?.addEventListener("click",async()=>{
+    if(activeRecognition && activeButton===koBtn){await stopRecognition(true);clearActive();return;}
     listen("ko-KR",koBox,koBtn,"내 한국어");
   });
 
-  
-  
+  document.addEventListener("visibilitychange",()=>{if(document.hidden)stopRecognition(true);});
+  window.addEventListener("pagehide",()=>stopRecognition(true));
+
   document.getElementById("copyEnglishBtn")?.addEventListener("click",()=>{
     const t=enBox.textContent.trim();
     navigator.clipboard?.writeText(t).then(()=>alert("복사했습니다.")).catch(()=>prompt("복사하세요.",t));
   });
-  
   document.getElementById("clearEnglishBtn")?.addEventListener("click",()=>enBox.textContent="영어 듣기 버튼을 누른 뒤 상대방에게 말해 달라고 하세요.");
   document.getElementById("clearKoreanBtn")?.addEventListener("click",()=>koBox.textContent="한국어 말하기 버튼을 누르고 하고 싶은 말을 말하세요.");
   document.getElementById("clearConversationLog")?.addEventListener("click",()=>{
