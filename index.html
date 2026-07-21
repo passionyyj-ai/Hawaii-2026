@@ -330,7 +330,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
 </head>
 <body>
 <input class="day-radio" type="radio" name="day" id="day0" checked><input class="day-radio" type="radio" name="day" id="day1"><input class="day-radio" type="radio" name="day" id="day2"><input class="day-radio" type="radio" name="day" id="day3"><input class="day-radio" type="radio" name="day" id="day4"><input class="day-radio" type="radio" name="day" id="day5"><input class="day-radio" type="radio" name="day" id="day6"><input class="day-radio" type="radio" name="day" id="day7"><input class="day-radio" type="radio" name="day" id="day8">
-<div class="app"><div class="version-banner">✅ TravelMate AI v18.0 · 자동 업데이트 · 일정 상세 · 첨부파일</div>
+<div class="app"><div class="version-banner">✅ TravelMate AI v18.1 · 자동 업데이트 · 일정 상세 · 첨부파일</div>
 <header class="hero">
   <div class="eyebrow">MY TRIP AGENT</div>
   <h1>🌺 TravelMate AI</h1>
@@ -1905,13 +1905,6 @@ document.getElementById("openVoucherLink").addEventListener("click",()=>{
   window.location.href=url;
 });
 </script>
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker.register("./sw.js").catch(function () {});
-  });
-}
-</script>
 
 <script>
 const v8Get=(k,d)=>{try{const v=localStorage.getItem(STORE_PREFIX+'v8_'+k);return v===null?d:JSON.parse(v)}catch{return d}};
@@ -2215,17 +2208,6 @@ renderCategories();renderPhrases();
 </script>
 
 
-<script>
-/* 새 버전 즉시 반영 */
-if("serviceWorker" in navigator){
-  window.addEventListener("load",async()=>{
-    try{
-      const regs=await navigator.serviceWorker.getRegistrations();
-      for(const reg of regs){await reg.update();}
-    }catch(e){}
-  });
-}
-</script>
 
 
 <script>
@@ -2958,32 +2940,66 @@ if("serviceWorker" in navigator){
 
 
 <script>
-/* TravelMate AI v18.0 — 자동 업데이트 + 일정 상세/첨부파일 */
+/* TravelMate AI v18.1 — 자동 업데이트 + 일정 상세/첨부파일 */
 (function(){
-  const APP_VERSION='18.0';
+  const APP_VERSION='18.1';
   const DB_NAME='travelmate_v18_data';
   const FILE_STORE='files';
   const DETAIL_STORE='details';
   const MAX_FILE_SIZE=20*1024*1024;
   let dbPromise, activeCard=null, refreshing=false;
 
-  // GitHub Pages 새 배포 자동 반영
+  // GitHub Pages 새 배포 안정적 자동 반영 (중복 등록·무한 새로고침 방지)
   if('serviceWorker' in navigator){
-    const showToast=()=>{
+    const UPDATE_GUARD='travelmate_update_reload_guard';
+    const showToast=(message='새 버전을 적용하고 있습니다…')=>{
       let t=document.getElementById('updateToastV18');
-      if(!t){t=document.createElement('div');t.id='updateToastV18';t.className='update-toast';t.innerHTML='<span>새 버전을 적용하고 있습니다…</span><button type="button">새로고침</button>';t.querySelector('button').onclick=()=>location.reload();document.body.appendChild(t)}
+      if(!t){
+        t=document.createElement('div');
+        t.id='updateToastV18';t.className='update-toast';
+        t.innerHTML='<span></span><button type="button">새로고침</button>';
+        t.querySelector('button').onclick=()=>location.reload();
+        document.body.appendChild(t);
+      }
+      t.querySelector('span').textContent=message;
       t.classList.add('show');
     };
-    navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;showToast();setTimeout(()=>location.reload(),600)});
+    const activateOnce=(worker)=>{
+      if(!worker || sessionStorage.getItem(UPDATE_GUARD)==='1') return;
+      sessionStorage.setItem(UPDATE_GUARD,'1');
+      showToast();
+      worker.postMessage({type:'SKIP_WAITING'});
+    };
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(sessionStorage.getItem(UPDATE_GUARD)!=='1') return;
+      location.reload();
+    });
     window.addEventListener('load',async()=>{
       try{
-        const reg=await navigator.serviceWorker.register('./sw.js?v='+APP_VERSION,{updateViaCache:'none'});
-        const activate=w=>w&&w.postMessage({type:'SKIP_WAITING'});
-        if(reg.waiting)activate(reg.waiting);
-        reg.addEventListener('updatefound',()=>{const w=reg.installing;if(!w)return;w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller){showToast();activate(w)}})});
-        await reg.update();
-        document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update().catch(()=>{})});
-        setInterval(()=>reg.update().catch(()=>{}),60*60*1000);
+        const reg=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});
+        // 새 Service Worker가 이미 대기 중이면 한 번만 활성화
+        if(reg.waiting && navigator.serviceWorker.controller) activateOnce(reg.waiting);
+        reg.addEventListener('updatefound',()=>{
+          const worker=reg.installing;
+          if(!worker)return;
+          worker.addEventListener('statechange',()=>{
+            if(worker.state==='installed' && navigator.serviceWorker.controller){
+              activateOnce(worker);
+            }
+          });
+        });
+        // 과도한 확인을 피하고, 화면 복귀 시 최대 10분에 한 번만 확인
+        let lastCheck=0;
+        const check=()=>{
+          const now=Date.now();
+          if(now-lastCheck<10*60*1000)return;
+          lastCheck=now;reg.update().catch(()=>{});
+        };
+        check();
+        document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')check()});
+        setInterval(check,60*60*1000);
+        // 정상 로드 후 재실행 방지 플래그 해제
+        setTimeout(()=>sessionStorage.removeItem(UPDATE_GUARD),5000);
       }catch(e){console.warn('자동 업데이트 확인 실패',e)}
     });
   }
