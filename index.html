@@ -353,7 +353,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
 </style></head>
 <body>
 <input class="day-radio" type="radio" name="day" id="day0" checked><input class="day-radio" type="radio" name="day" id="day1"><input class="day-radio" type="radio" name="day" id="day2"><input class="day-radio" type="radio" name="day" id="day3"><input class="day-radio" type="radio" name="day" id="day4"><input class="day-radio" type="radio" name="day" id="day5"><input class="day-radio" type="radio" name="day" id="day6"><input class="day-radio" type="radio" name="day" id="day7"><input class="day-radio" type="radio" name="day" id="day8">
-<div class="app"><div class="version-banner">✅ TravelMate AI v21.0 · 안정화 · 음성 인식 · 여행 공유</div><div style="display:flex;justify-content:flex-end;margin:8px 0 2px"><button id="v20TripButton" class="btn primary" type="button">☁️ 여행 공유</button></div>
+<div class="app"><div class="version-banner">✅ TravelMate AI v21.1 · 안정화 · 음성 인식 · 여행 공유</div><div style="display:flex;justify-content:flex-end;margin:8px 0 2px"><button id="v20TripButton" class="btn primary" type="button">☁️ 여행 공유</button></div>
 <header class="hero">
   <div class="eyebrow">MY TRIP AGENT</div>
   <h1>🌺 TravelMate AI</h1>
@@ -2235,7 +2235,7 @@ renderCategories();renderPhrases();
 
 
 <script>
-/* TravelMate AI v21.0 — 단일 세션 음성 인식 안정화 */
+/* TravelMate AI v21.1 — 단일 세션 음성 인식 안정화 */
 (function(){
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const support = document.getElementById("interpreterSupport");
@@ -2832,9 +2832,9 @@ renderCategories();renderPhrases();
 
 
 <script>
-/* TravelMate AI v21.0 — 일정 상세/첨부파일 */
+/* TravelMate AI v21.1 — 일정 상세/첨부파일 */
 (function(){
-  const APP_VERSION='21.0';
+  const APP_VERSION='21.1';
   const DB_NAME='travelmate_v18_data';
   const FILE_STORE='files';
   const DETAIL_STORE='details';
@@ -2988,7 +2988,7 @@ renderCategories();renderPhrases();
 
 
 <script>
-/* TravelMate AI v21.0 — 일정 추가·수정·삭제 */
+/* TravelMate AI v21.1 — 일정 추가·수정·삭제 */
 (function(){
   const STORE='travelmate_v19_schedule_changes';
   let editingCard=null, activePanel=null;
@@ -3045,5 +3045,5 @@ renderCategories();renderPhrases();
  window.addEventListener('load',()=>{pull();setInterval(push,2500);setInterval(pull,30000)});
 })();
 </script>
-<script src="./v21.js?v=21.0"></script></body>
+<script src="./v21.js?v=21.1"></script></body>
 </html>

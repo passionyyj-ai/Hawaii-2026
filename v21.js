@@ -7,7 +7,7 @@
 
   const getCfg=()=>{try{return JSON.parse(localStorage.getItem(CFG)||'{}')}catch{return {}}};
   const setCfg=c=>localStorage.setItem(CFG,JSON.stringify(c));
-  const cleanCode=v=>String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);
+  const cleanCode=v=>{const raw=String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);return raw.length>4?raw.slice(0,4)+'-'+raw.slice(4):raw};
   const makeCode=()=>{const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let out='';crypto.getRandomValues(new Uint8Array(8)).forEach(n=>out+=chars[n%chars.length]);return out.slice(0,4)+'-'+out.slice(4,8)};
 
   function cloudDefaults(){
