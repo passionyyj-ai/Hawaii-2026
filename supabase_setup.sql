@@ -36,3 +36,14 @@ drop policy if exists "travelmate storage write" on storage.objects;
 create policy "travelmate storage write" on storage.objects for insert to anon with check (bucket_id='travelmate-files');
 drop policy if exists "travelmate storage delete" on storage.objects;
 create policy "travelmate storage delete" on storage.objects for delete to anon using (bucket_id='travelmate-files');
+
+-- v20 여행 생성/참가용 메타데이터
+create table if not exists public.travelmate_trips (
+  trip_code text primary key,
+  trip_name text not null,
+  created_at timestamptz not null default now()
+);
+alter table public.travelmate_trips enable row level security;
+drop policy if exists "travelmate trips anon" on public.travelmate_trips;
+create policy "travelmate trips anon" on public.travelmate_trips
+for all to anon using (true) with check (true);

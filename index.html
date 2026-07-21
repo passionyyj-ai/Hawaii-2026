@@ -348,10 +348,12 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
 
 </style>
 <script src="./config.js"></script>
-</head>
+<style>
+.v20-backdrop{position:fixed;inset:0;background:rgba(8,24,30,.62);z-index:11000;display:none;align-items:center;justify-content:center;padding:14px}.v20-backdrop.show{display:flex}.v20-modal{width:min(680px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:24px;padding:20px;box-shadow:0 28px 80px rgba(0,0,0,.32)}.v20-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.v20-card{border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px}.v20-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.v20-field{display:grid;gap:5px}.v20-field.full{grid-column:1/-1}.v20-field input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;padding:11px}.v20-code{font-size:25px;font-weight:900;letter-spacing:2px;text-align:center;padding:12px;border-radius:14px;background:#eef8f5}.v20-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.v20-progress{white-space:pre-line;font-size:13px;padding:10px;border-radius:12px;background:#f5f7f8;margin-top:10px}.v20-qr{display:block;width:220px;height:220px;max-width:100%;margin:10px auto;border-radius:12px}.v20-note{font-size:12px;color:var(--muted);line-height:1.5}@media(max-width:600px){.v20-grid{grid-template-columns:1fr}.v20-field.full{grid-column:auto}}
+</style></head>
 <body>
 <input class="day-radio" type="radio" name="day" id="day0" checked><input class="day-radio" type="radio" name="day" id="day1"><input class="day-radio" type="radio" name="day" id="day2"><input class="day-radio" type="radio" name="day" id="day3"><input class="day-radio" type="radio" name="day" id="day4"><input class="day-radio" type="radio" name="day" id="day5"><input class="day-radio" type="radio" name="day" id="day6"><input class="day-radio" type="radio" name="day" id="day7"><input class="day-radio" type="radio" name="day" id="day8">
-<div class="app"><div class="version-banner">✅ TravelMate AI v19.1 · 안정 업데이트 · 일정 상세 · 첨부파일</div>
+<div class="app"><div class="version-banner">✅ TravelMate AI v20.0 · 안정 업데이트 · 일정 상세 · 첨부파일</div><div style="display:flex;justify-content:flex-end;margin:8px 0 2px"><button id="v20TripButton" class="btn primary" type="button">☁️ 여행 공유</button></div>
 <header class="hero">
   <div class="eyebrow">MY TRIP AGENT</div>
   <h1>🌺 TravelMate AI</h1>
@@ -2962,9 +2964,9 @@ renderCategories();renderPhrases();
 
 
 <script>
-/* TravelMate AI v19.1 — 새로고침 루프 제거 + 일정 상세/첨부파일 */
+/* TravelMate AI v20.0 — 새로고침 루프 제거 + 일정 상세/첨부파일 */
 (function(){
-  const APP_VERSION='19.1';
+  const APP_VERSION='20.0';
   const DB_NAME='travelmate_v18_data';
   const FILE_STORE='files';
   const DETAIL_STORE='details';
@@ -2980,13 +2982,8 @@ renderCategories();renderPhrases();
     if(r.status===204)return null; const t=await r.text(); return t?JSON.parse(t):null;
   }
   function setupCloud(){
-    const old=cloudCfg();
-    const url=prompt('Supabase Project URL',old.url||'https://fjpczzjrzxsyqolwfebh.supabase.co'); if(url===null)return;
-    const anonKey=prompt('Supabase anon public key',old.anonKey||''); if(anonKey===null)return;
-    const shareCode=prompt('가족과 함께 사용할 공유 코드',old.shareCode||'HAWAII2026'); if(shareCode===null)return;
-    localStorage.setItem(CLOUD_KEY,JSON.stringify({url:url.trim(),anonKey:anonKey.trim(),shareCode:shareCode.trim()}));
-    alert('클라우드 설정을 저장했습니다. 같은 URL·키·공유 코드를 다른 휴대폰에도 입력하세요.');
-    location.reload();
+    if(window.openV20TripCenter) window.openV20TripCenter();
+    else alert('여행 공유 화면을 준비 중입니다. 잠시 후 다시 눌러 주세요.');
   }
   let dbPromise, activeCard=null, refreshing=false;
 
@@ -3123,7 +3120,7 @@ renderCategories();renderPhrases();
 
 
 <script>
-/* TravelMate AI v19.1 — 일정 추가·수정·삭제 */
+/* TravelMate AI v20.0 — 일정 추가·수정·삭제 */
 (function(){
   const STORE='travelmate_v19_schedule_changes';
   let editingCard=null, activePanel=null;
@@ -3180,5 +3177,5 @@ renderCategories();renderPhrases();
  window.addEventListener('load',()=>{pull();setInterval(push,2500);setInterval(pull,30000)});
 })();
 </script>
-</body>
+<script src="./v20.js"></script></body>
 </html>
