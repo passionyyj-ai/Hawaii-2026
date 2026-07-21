@@ -47,13 +47,3 @@ alter table public.travelmate_trips enable row level security;
 drop policy if exists "travelmate trips anon" on public.travelmate_trips;
 create policy "travelmate trips anon" on public.travelmate_trips
 for all to anon using (true) with check (true);
-
--- v21: 생성·참가·공유 링크가 모두 XXXX-XXXX 형식을 사용하도록 보장합니다.
-do $$ begin
-  alter table public.travelmate_trips
-    add constraint travelmate_trip_code_format
-    check (trip_code ~ '^[A-Z2-9]{4}-[A-Z2-9]{4}$');
-exception when duplicate_object then null;
-end $$;
-create index if not exists travelmate_details_share_code_idx on public.travelmate_details(share_code);
-create index if not exists travelmate_attachments_share_schedule_idx on public.travelmate_attachments(share_code,schedule_key);
