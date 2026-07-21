@@ -310,6 +310,17 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
 @media(max-width:520px){.attachment-row{align-items:flex-start}.attachment-actions{flex-direction:column}}
 
 
+/* v18.3 첨부파일 미리보기 */
+.v18-preview-backdrop{position:fixed;inset:0;background:rgba(15,32,38,.78);z-index:10050;display:none;align-items:center;justify-content:center;padding:14px}
+.v18-preview-backdrop.show{display:flex}
+.v18-preview{width:min(980px,100%);height:min(88vh,900px);background:#fff;border-radius:18px;display:flex;flex-direction:column;overflow:hidden}
+.v18-preview-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.v18-preview-title{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v18-preview-body{flex:1;min-height:0;background:#eef3f4;display:flex;align-items:center;justify-content:center}
+.v18-preview-body iframe{width:100%;height:100%;border:0;background:#fff}
+.v18-preview-body img{max-width:100%;max-height:100%;object-fit:contain}
+.v18-preview-message{padding:24px;text-align:center;color:var(--muted);font-weight:800}
+.v18-preview-actions{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--line);flex-wrap:wrap}
 /* v18 일정 상세·첨부파일 */
 .schedule-detail-btn{margin-left:auto;background:#fff7e6;border-color:#efb44d;color:#754900;font-weight:900}
 .schedule-detail-btn .file-badge{display:inline-flex;min-width:19px;height:19px;padding:0 5px;align-items:center;justify-content:center;border-radius:999px;background:#0a8791;color:#fff;font-size:11px}
@@ -325,12 +336,22 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
 .v18-file-list{display:grid;gap:8px;margin-top:10px}.v18-file{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:12px;background:#f8fbfb}.v18-file-main{min-width:0;flex:1}.v18-file-name{font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v18-file-meta{font-size:11px;color:var(--muted);margin-top:3px}.v18-file-actions{display:flex;gap:5px}.v18-empty{padding:15px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
 .v18-sync-note{font-size:12px;color:var(--muted);line-height:1.55;background:#f3f8f8;padding:10px;border-radius:12px;margin-top:10px}
 @media(min-width:721px){.v18-modal-backdrop{align-items:center;padding:24px}.v18-modal{border-radius:24px}.v18-modal-head{top:-20px}}
+
+/* v19 일정 편집 */
+.schedule-manage-bar{display:flex;justify-content:flex-end;margin:12px 0 4px}.schedule-add-btn{font-weight:900}
+.schedule-edit-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.schedule-edit-actions button{padding:7px 9px;font-size:12px}
+.v19-modal-backdrop{position:fixed;inset:0;background:rgba(8,24,30,.58);z-index:10030;display:none;align-items:center;justify-content:center;padding:16px}.v19-modal-backdrop.show{display:flex}
+.v19-modal{width:min(620px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.28);padding:20px}
+.v19-modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.v19-modal-head h2{margin:0}
+.v19-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.v19-field{display:grid;gap:6px;margin-bottom:12px}.v19-field.full{grid-column:1/-1}.v19-field label{font-weight:850;font-size:13px}.v19-field input,.v19-field textarea,.v19-field select{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;padding:11px;background:#fff}.v19-field textarea{min-height:90px;resize:vertical}.v19-modal-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:8px}
+@media(max-width:600px){.v19-grid{grid-template-columns:1fr}.v19-field.full{grid-column:auto}}
+
 </style>
 <script src="./config.js"></script>
 </head>
 <body>
 <input class="day-radio" type="radio" name="day" id="day0" checked><input class="day-radio" type="radio" name="day" id="day1"><input class="day-radio" type="radio" name="day" id="day2"><input class="day-radio" type="radio" name="day" id="day3"><input class="day-radio" type="radio" name="day" id="day4"><input class="day-radio" type="radio" name="day" id="day5"><input class="day-radio" type="radio" name="day" id="day6"><input class="day-radio" type="radio" name="day" id="day7"><input class="day-radio" type="radio" name="day" id="day8">
-<div class="app"><div class="version-banner">✅ TravelMate AI v18.2 · 안정 업데이트 · 일정 상세 · 첨부파일</div>
+<div class="app"><div class="version-banner">✅ TravelMate AI v19.0 · 안정 업데이트 · 일정 상세 · 첨부파일</div>
 <header class="hero">
   <div class="eyebrow">MY TRIP AGENT</div>
   <h1>🌺 TravelMate AI</h1>
@@ -430,6 +451,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>8개 일정</span>
       </div>
+      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_0_0">
           <div class="dot"></div>
@@ -529,6 +551,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>7개 일정</span>
       </div>
+      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_1_0">
           <div class="dot"></div>
@@ -617,6 +640,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>6개 일정</span>
       </div>
+      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_2_0">
           <div class="dot"></div>
@@ -694,6 +718,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>8개 일정</span>
       </div>
+      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_3_0">
           <div class="dot"></div>
@@ -793,6 +818,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>6개 일정</span>
       </div>
+      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_4_0">
           <div class="dot"></div>
@@ -870,6 +896,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>5개 일정</span>
       </div>
+      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_5_0">
           <div class="dot"></div>
@@ -936,6 +963,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>9개 일정</span>
       </div>
+      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_6_0">
           <div class="dot"></div>
@@ -1046,6 +1074,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>9개 일정</span>
       </div>
+      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_7_0">
           <div class="dot"></div>
@@ -1156,6 +1185,7 @@ textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3e5;border-radius
         </div>
         <span>6개 일정</span>
       </div>
+      <div class="schedule-manage-bar"><button class="btn primary schedule-add-btn" type="button">＋ 일정 추가</button></div>
       <div class="timeline">
         <article class="item" data-done-key="schedule_8_0">
           <div class="dot"></div>
@@ -2940,9 +2970,9 @@ renderCategories();renderPhrases();
 
 
 <script>
-/* TravelMate AI v18.2 — 새로고침 루프 제거 + 일정 상세/첨부파일 */
+/* TravelMate AI v19.0 — 새로고침 루프 제거 + 일정 상세/첨부파일 */
 (function(){
-  const APP_VERSION='18.2';
+  const APP_VERSION='19.0';
   const DB_NAME='travelmate_v18_data';
   const FILE_STORE='files';
   const DETAIL_STORE='details';
@@ -3014,21 +3044,97 @@ renderCategories();renderPhrases();
   }
   async function saveActive(){if(!activeCard)return;await saveDetails({scheduleKey:activeCard.dataset.doneKey,reservation:document.getElementById('v18Reservation').value.trim(),phone:document.getElementById('v18Phone').value.trim(),url:document.getElementById('v18Url').value.trim(),memo:document.getElementById('v18Memo').value.trim()});const b=document.getElementById('v18Save');const old=b.textContent;b.textContent='저장 완료 ✓';setTimeout(()=>b.textContent=old,1200)}
   async function uploadActive(e){if(!activeCard)return;const input=e.currentTarget;const files=[...(input.files||[])];for(const f of files){if(f.size>MAX_FILE_SIZE){alert('파일당 최대 20MB입니다: '+f.name);continue}await addFile(activeCard.dataset.doneKey,f)}input.value='';await renderActiveFiles();await updateBadge(activeCard)}
+  let previewObjectUrl=null;
+  function ensurePreview(){
+    let wrap=document.getElementById('v18PreviewBackdrop');
+    if(wrap)return wrap;
+    wrap=document.createElement('div');wrap.id='v18PreviewBackdrop';wrap.className='v18-preview-backdrop';
+    wrap.innerHTML=`<div class="v18-preview" role="dialog" aria-modal="true"><div class="v18-preview-head"><div id="v18PreviewTitle" class="v18-preview-title">첨부파일</div><button id="v18PreviewClose" class="btn ghost" type="button">✕ 닫기</button></div><div id="v18PreviewBody" class="v18-preview-body"></div><div class="v18-preview-actions"><button id="v18PreviewNewTab" class="btn secondary" type="button">새 창에서 열기</button><button id="v18PreviewDownload" class="btn ghost" type="button">파일 저장</button></div></div>`;
+    document.body.appendChild(wrap);
+    const close=()=>{wrap.classList.remove('show');document.getElementById('v18PreviewBody').innerHTML='';if(previewObjectUrl){URL.revokeObjectURL(previewObjectUrl);previewObjectUrl=null}};
+    document.getElementById('v18PreviewClose').onclick=close;wrap.addEventListener('click',e=>{if(e.target===wrap)close()});
+    return wrap;
+  }
+  function triggerDownload(url,name){const a=document.createElement('a');a.href=url;a.download=name||'attachment';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()}
+  function openFilePreview(f){
+    const wrap=ensurePreview();
+    if(previewObjectUrl)URL.revokeObjectURL(previewObjectUrl);
+    previewObjectUrl=URL.createObjectURL(f.blob);
+    document.getElementById('v18PreviewTitle').textContent=f.name;
+    const body=document.getElementById('v18PreviewBody');
+    if((f.type||'').startsWith('image/')) body.innerHTML=`<img alt="${esc(f.name)}">`,body.querySelector('img').src=previewObjectUrl;
+    else if(f.type==='application/pdf'||/\.pdf$/i.test(f.name)) body.innerHTML=`<iframe title="${esc(f.name)}"></iframe>`,body.querySelector('iframe').src=previewObjectUrl;
+    else body.innerHTML='<div class="v18-preview-message">이 파일 형식은 앱 안에서 미리 볼 수 없습니다.<br>아래의 “파일 저장” 버튼을 이용해 주세요.</div>';
+    document.getElementById('v18PreviewNewTab').onclick=()=>{
+      const w=window.open('about:blank','_blank');
+      if(w){w.location.href=previewObjectUrl}else{location.href=previewObjectUrl}
+    };
+    document.getElementById('v18PreviewDownload').onclick=()=>triggerDownload(previewObjectUrl,f.name);
+    wrap.classList.add('show');
+  }
   async function renderActiveFiles(){
     if(!activeCard)return;const files=await listFiles(activeCard.dataset.doneKey);document.getElementById('v18Count').textContent=files.length+'개';const root=document.getElementById('v18Files');
     if(!files.length){root.innerHTML='<div class="v18-empty">아직 첨부된 파일이 없습니다.</div>';return}
     root.innerHTML=files.map(f=>`<div class="v18-file"><div class="v18-file-main"><div class="v18-file-name">${f.type.startsWith('image/')?'🖼️':'📄'} ${esc(f.name)}</div><div class="v18-file-meta">${size(f.size)} · ${new Date(f.updatedAt).toLocaleString('ko-KR')}</div></div><div class="v18-file-actions"><button class="btn secondary" data-open="${f.id}" type="button">열기</button><button class="btn ghost" data-del="${f.id}" type="button">삭제</button></div></div>`).join('');
-    root.querySelectorAll('[data-open]').forEach(btn=>btn.onclick=()=>{const f=files.find(x=>x.id===btn.dataset.open);if(!f)return;const u=URL.createObjectURL(f.blob);window.open(u,'_blank');setTimeout(()=>URL.revokeObjectURL(u),120000)});
+    root.querySelectorAll('[data-open]').forEach(btn=>btn.onclick=()=>{const f=files.find(x=>x.id===btn.dataset.open);if(!f)return;openFilePreview(f)});
     root.querySelectorAll('[data-del]').forEach(btn=>btn.onclick=async()=>{const f=files.find(x=>x.id===btn.dataset.del);if(!f||!confirm('"'+f.name+'" 파일을 삭제할까요?'))return;await deleteFile(f.id);await renderActiveFiles();await updateBadge(activeCard)});
   }
-  function init(){
-    ensureModal();
-    document.querySelectorAll('#schedulePage article.item[data-done-key]').forEach(card=>{
+  function bindCard(card){
       let actions=card.querySelector('.actions');if(!actions){actions=document.createElement('div');actions.className='actions';card.appendChild(actions)}
       if(actions.querySelector('.schedule-detail-btn'))return;
       const btn=document.createElement('button');btn.type='button';btn.className='btn schedule-detail-btn';btn.innerHTML='📎 첨부·메모 <span class="file-badge">0</span>';btn.onclick=()=>openDetail(card);actions.insertBefore(btn,actions.firstChild);updateBadge(card).catch(()=>{});
-    });
   }
+  window.TravelMateAttachments={bindCard};
+  function init(){
+    ensureModal();
+    document.querySelectorAll('#schedulePage article.item[data-done-key]').forEach(bindCard);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
+
+<script>
+/* TravelMate AI v19.0 — 일정 추가·수정·삭제 */
+(function(){
+  const STORE='travelmate_v19_schedule_changes';
+  let editingCard=null, activePanel=null;
+  const esc=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const load=()=>{try{return JSON.parse(localStorage.getItem(STORE)||'{"custom":[],"edited":{},"deleted":[]}')}catch{return {custom:[],edited:{},deleted:[]}}};
+  const save=v=>localStorage.setItem(STORE,JSON.stringify(v));
+  const uid=()=> 'custom_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+  function modal(){
+    let w=document.getElementById('v19ScheduleModal'); if(w)return w;
+    w=document.createElement('div');w.id='v19ScheduleModal';w.className='v19-modal-backdrop';w.innerHTML=`<div class="v19-modal"><div class="v19-modal-head"><h2 id="v19ModalTitle">일정 추가</h2><button class="btn ghost" id="v19Close" type="button">✕</button></div><div class="v19-grid"><div class="v19-field"><label>시작 시간</label><input id="v19Start" type="time"></div><div class="v19-field"><label>종료 시간</label><input id="v19End" type="time"></div><div class="v19-field full"><label>일정명 *</label><input id="v19Place" placeholder="예: 하나우마베이 방문"></div><div class="v19-field full"><label>메모</label><textarea id="v19Note" placeholder="준비물, 예약시간, 이동 방법 등"></textarea></div><div class="v19-field full"><label>장소 또는 지도 검색어</label><input id="v19Map" placeholder="예: Hanauma Bay"></div></div><div class="v19-modal-actions"><button class="btn ghost" id="v19Cancel" type="button">취소</button><button class="btn primary" id="v19Save" type="button">저장</button></div></div>`;
+    document.body.appendChild(w); const close=()=>w.classList.remove('show');
+    w.querySelector('#v19Close').onclick=close;w.querySelector('#v19Cancel').onclick=close;w.addEventListener('click',e=>{if(e.target===w)close()});w.querySelector('#v19Save').onclick=saveSchedule;
+    return w;
+  }
+  const value=id=>document.getElementById(id).value.trim();
+  function openEditor(panel,card=null){
+    activePanel=panel;editingCard=card;modal();document.getElementById('v19ModalTitle').textContent=card?'일정 수정':'일정 추가';
+    let st='',en='',pl='',no='',mp='';
+    if(card){const t=card.querySelector('.time')?.textContent.trim()||'';[st,en]=t.split('~').map(x=>x?.trim()||'');pl=card.querySelector('.place')?.textContent.trim()||'';no=card.querySelector('.note')?.textContent.trim()||'';mp=card.dataset.mapQuery||pl}
+    document.getElementById('v19Start').value=/^\d\d:\d\d$/.test(st)?st:'';document.getElementById('v19End').value=/^\d\d:\d\d$/.test(en)?en:'';document.getElementById('v19Place').value=pl;document.getElementById('v19Note').value=no;document.getElementById('v19Map').value=mp;
+    document.getElementById('v19ScheduleModal').classList.add('show');setTimeout(()=>document.getElementById('v19Place').focus(),50);
+  }
+  function cardData(card){return {key:card.dataset.doneKey,time:card.querySelector('.time')?.textContent.trim()||'',place:card.querySelector('.place')?.textContent.trim()||'',note:card.querySelector('.note')?.textContent.trim()||'',map:card.dataset.mapQuery||card.querySelector('.place')?.textContent.trim()||'',panel:[...document.querySelectorAll('.day-panel')].indexOf(card.closest('.day-panel'))}}
+  function renderCard(d){
+    const a=document.createElement('article');a.className='item';a.dataset.doneKey=d.key;a.dataset.mapQuery=d.map||d.place;a.innerHTML=`<div class="dot"></div><div class="time">${esc(d.time)}</div><div class="place">${esc(d.place)}</div><div class="note">${esc(d.note)}</div><div class="actions"><a class="btn secondary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.map||d.place)}">📍 지도</a><label class="done-label"><input class="persist-check" type="checkbox"> 완료</label></div>`;return a;
+  }
+  function addManage(card){
+    if(card.querySelector('.schedule-edit-actions'))return;const x=document.createElement('div');x.className='schedule-edit-actions';x.innerHTML='<button class="btn ghost v19-edit" type="button">✏️ 수정</button><button class="btn ghost v19-delete" type="button">🗑 삭제</button>';card.appendChild(x);x.querySelector('.v19-edit').onclick=()=>openEditor(card.closest('.day-panel'),card);x.querySelector('.v19-delete').onclick=()=>removeCard(card);window.TravelMateAttachments?.bindCard(card);
+  }
+  function saveSchedule(){
+    const place=value('v19Place');if(!place)return alert('일정명을 입력하세요.');const start=value('v19Start'),end=value('v19End');const d={time:start+(end?'~'+end:''),place,note:value('v19Note'),map:value('v19Map')||place};const state=load();
+    if(editingCard){Object.assign(d,{key:editingCard.dataset.doneKey,panel:[...document.querySelectorAll('.day-panel')].indexOf(activePanel)});editingCard.querySelector('.time').textContent=d.time;editingCard.querySelector('.place').textContent=d.place;editingCard.querySelector('.note').textContent=d.note;editingCard.dataset.mapQuery=d.map;const link=editingCard.querySelector('.actions a');if(link)link.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(d.map);state.edited[d.key]=d;const ci=state.custom.findIndex(x=>x.key===d.key);if(ci>=0)state.custom[ci]=d;
+    }else{d.key=uid();d.panel=[...document.querySelectorAll('.day-panel')].indexOf(activePanel);state.custom.push(d);const c=renderCard(d);activePanel.querySelector('.timeline').appendChild(c);addManage(c)}
+    save(state);document.getElementById('v19ScheduleModal').classList.remove('show');updateCounts();
+  }
+  function removeCard(card){const name=card.querySelector('.place')?.textContent.trim()||'이 일정';if(!confirm(`“${name}” 일정을 삭제할까요?`))return;const state=load(),key=card.dataset.doneKey;if(key.startsWith('custom_'))state.custom=state.custom.filter(x=>x.key!==key);else if(!state.deleted.includes(key))state.deleted.push(key);delete state.edited[key];save(state);card.remove();updateCounts()}
+  function updateCounts(){document.querySelectorAll('.day-panel').forEach(p=>{const n=p.querySelectorAll('.timeline article.item').length;const span=p.querySelector('.day-header>span');if(span)span.textContent=n+'개 일정'})}
+  function applyStored(){const state=load();document.querySelectorAll('#schedulePage article.item[data-done-key]').forEach(card=>{const k=card.dataset.doneKey;if(state.deleted.includes(k)){card.remove();return}const e=state.edited[k];if(e){card.querySelector('.time').textContent=e.time;card.querySelector('.place').textContent=e.place;card.querySelector('.note').textContent=e.note;card.dataset.mapQuery=e.map;const link=card.querySelector('.actions a');if(link)link.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(e.map||e.place)}addManage(card)});state.custom.forEach(d=>{const p=document.querySelectorAll('.day-panel')[d.panel];if(p&&!p.querySelector(`[data-done-key="${CSS.escape(d.key)}"]`)){const c=renderCard(d);p.querySelector('.timeline').appendChild(c);addManage(c)}});updateCounts()}
+  function init(){modal();document.querySelectorAll('.day-panel').forEach(p=>p.querySelector('.schedule-add-btn')?.addEventListener('click',()=>openEditor(p)));applyStored()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
