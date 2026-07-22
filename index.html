@@ -2251,6 +2251,10 @@ renderCategories();renderPhrases();
   let activeButton = null;
   let activeSession = 0;
   let isStarting = false;
+  let activePcmRecorder = null;
+  let activePcmTarget = null;
+  let activePcmWho = "";
+  let activePcmLang = "";
 
   function getLog(){
     try{return JSON.parse(localStorage.getItem(STORE_PREFIX+"interpreter_log")||"[]")}catch(e){return []}
@@ -2271,7 +2275,12 @@ renderCategories();renderPhrases();
       return `<div class="log-item"><div class="who">${x.who} · ${d.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})}</div><div>${x.text}</div></div>`;
     }).join(""):"기록이 없습니다.";
   }
-  function defaultLabel(button){ return button===enBtn ? "🎤 영어 듣기" : "🎤 한국어 말하기"; }
+  function defaultLabel(button){
+    const recordingMode=isStandalone||isMobileVoiceEnvironment();
+    return button===enBtn
+      ? (recordingMode ? "🎤 영어 녹음 시작" : "🎤 영어 듣기")
+      : (recordingMode ? "🎤 한국어 녹음 시작" : "🎤 한국어 말하기");
+  }
   function resetButton(button){
     if(!button) return;
     button.classList.remove("listening");
@@ -2289,6 +2298,50 @@ renderCategories();renderPhrases();
     activeRecognition=null; activeButton=null; isStarting=false;
     resetButton(btn);
     if(rec){ try{rec.abort();}catch(e){} }
+  }
+
+  const isMobileVoiceEnvironment=()=>/iphone|ipad|ipod|android/i.test(navigator.userAgent)
+    || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  function mergeFloat32Chunks(chunks){
+    const length=chunks.reduce((sum,chunk)=>sum+chunk.length,0),merged=new Float32Array(length);
+    let offset=0;for(const chunk of chunks){merged.set(chunk,offset);offset+=chunk.length}return merged;
+  }
+  function downsamplePcm(input,inputRate,outputRate=16000){
+    if(!input.length||outputRate>=inputRate)return input;
+    const ratio=inputRate/outputRate,length=Math.max(1,Math.round(input.length/ratio)),output=new Float32Array(length);
+    for(let i=0;i<length;i++){const start=Math.floor(i*ratio),end=Math.min(input.length,Math.floor((i+1)*ratio));let sum=0;for(let j=start;j<end;j++)sum+=input[j];output[i]=sum/Math.max(1,end-start)}
+    return output;
+  }
+  function pcmToWavBlob(samples,sampleRate=16000){
+    const buffer=new ArrayBuffer(44+samples.length*2),view=new DataView(buffer);
+    const write=(o,t)=>{for(let i=0;i<t.length;i++)view.setUint8(o+i,t.charCodeAt(i))};
+    write(0,"RIFF");view.setUint32(4,36+samples.length*2,true);write(8,"WAVE");write(12,"fmt ");view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);view.setUint32(24,sampleRate,true);view.setUint32(28,sampleRate*2,true);view.setUint16(32,2,true);view.setUint16(34,16,true);write(36,"data");view.setUint32(40,samples.length*2,true);
+    let offset=44;for(const sample of samples){const value=Math.max(-1,Math.min(1,sample));view.setInt16(offset,value<0?value*0x8000:value*0x7fff,true);offset+=2}return new Blob([buffer],{type:"audio/wav"});
+  }
+  async function startPcmRecorder(){
+    if(!navigator.mediaDevices?.getUserMedia)throw new Error("이 기기에서는 마이크를 사용할 수 없습니다.");
+    const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1}});
+    const Context=window.AudioContext||window.webkitAudioContext;if(!Context){stream.getTracks().forEach(t=>t.stop());throw new Error("WAV 녹음을 지원하지 않습니다.")}
+    const context=new Context();if(context.state==="suspended")await context.resume();
+    const source=context.createMediaStreamSource(stream),processor=context.createScriptProcessor(4096,1,1),gain=context.createGain(),chunks=[];gain.gain.value=0;
+    processor.onaudioprocess=e=>chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));source.connect(processor);processor.connect(gain);gain.connect(context.destination);
+    let stopped=false;return {state:"recording",async stop(){if(stopped)return null;stopped=true;this.state="inactive";processor.onaudioprocess=null;try{source.disconnect();processor.disconnect();gain.disconnect()}catch(e){}stream.getTracks().forEach(t=>t.stop());const rate=context.sampleRate||48000;try{await context.close()}catch(e){}const merged=mergeFloat32Chunks(chunks);if(merged.length<rate*.35)throw new Error("1초 이상 말씀해 주세요.");return pcmToWavBlob(downsamplePcm(merged,rate,16000),16000)},cancel(){stopped=true;this.state="inactive";processor.onaudioprocess=null;try{source.disconnect();processor.disconnect();gain.disconnect()}catch(e){}stream.getTracks().forEach(t=>t.stop());context.close().catch(()=>{})}};
+  }
+  function blobToDataUrl(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result));r.onerror=()=>reject(new Error("녹음 파일을 읽지 못했습니다."));r.readAsDataURL(blob)})}
+  async function transcribeRecording(blob,lang){
+    const cfg=window.HAWAII_CONFIG||{},url=String(cfg.supabaseFunctionUrl||"").trim();if(!url)throw new Error("음성 변환 서버가 설정되지 않았습니다.");
+    const audio=await blobToDataUrl(blob),response=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json",...(cfg.supabaseAnonKey?{apikey:cfg.supabaseAnonKey,Authorization:"Bearer "+cfg.supabaseAnonKey}:{})},body:JSON.stringify({mode:"transcribe",audio,mimeType:blob.type||"audio/wav",language:lang})});
+    let data={};try{data=await response.json()}catch(e){}if(!response.ok)throw new Error(data.error||`음성 변환 서버 오류 (${response.status})`);const text=String(data.text||data.transcript||data.result||"").trim();if(!text)throw new Error("음성을 인식하지 못했습니다.");return text;
+  }
+  async function stopPcmAndTranscribe(){
+    if(!activePcmRecorder)return;const recorder=activePcmRecorder,target=activePcmTarget,button=activeButton,who=activePcmWho,lang=activePcmLang;activePcmRecorder=null;activePcmTarget=null;activePcmWho="";activePcmLang="";if(button){button.disabled=true;button.textContent="음성을 글자로 변환하는 중…"}target.textContent="음성을 글자로 변환하고 있습니다…";
+    try{const blob=await recorder.stop(),text=await transcribeRecording(blob,lang);target.textContent=text;addLog(who,text)}catch(e){target.textContent="음성 인식 실패: "+(e?.message||"알 수 없는 오류")}finally{resetButton(button);activeButton=null}
+  }
+  async function startMobileRecording(lang,target,button,who){
+    if(activePcmRecorder){await stopPcmAndTranscribe();return}
+    if(isStarting)return;
+    stopRecognition();isStarting=true;activeButton=button;activePcmTarget=target;activePcmWho=who;activePcmLang=lang;button.classList.add("listening");button.textContent="⏹ 말한 뒤 여기를 눌러 인식";target.textContent="듣고 있습니다… 말한 뒤 버튼을 다시 누르세요.";
+    try{activePcmRecorder=await startPcmRecorder()}catch(e){target.textContent="마이크 시작 실패: "+(e?.message||"알 수 없는 오류");resetButton(button);activeButton=null;activePcmTarget=null}finally{isStarting=false}
   }
   function safariInterpreterUrl(){
     const url=new URL(window.location.href);
@@ -2350,7 +2403,7 @@ renderCategories();renderPhrases();
   }
 
   async function listen(lang,target,button,who){
-    if(isStandalone){ openSafariInterpreter(); return; }
+    if(isStandalone||isMobileVoiceEnvironment()){ await startMobileRecording(lang,target,button,who); return; }
     if(!SpeechRecognition){
       alert("이 브라우저에서는 음성 인식을 지원하지 않습니다. Safari에서 다시 열어 주세요.");
       return;
@@ -2417,10 +2470,10 @@ renderCategories();renderPhrases();
 
   if(isStandalone){
     if(support){
-      support.innerHTML='📱 홈 화면 앱에서는 iPhone 음성 인식이 제한됩니다.<br><b>아래 버튼을 누르면 Safari용 주소를 복사하고 여는 방법을 안내합니다.</b>';
+      support.innerHTML='✅ 홈 화면 음성 녹음 모드입니다.<br><b>버튼을 누르고 말한 뒤 같은 버튼을 다시 누르면 음성이 글자로 변환됩니다.</b>';
     }
-    if(enBtn) enBtn.textContent="🌐 Safari 영어 통역 열기 안내";
-    if(koBtn) koBtn.textContent="🌐 Safari 한국어 통역 열기 안내";
+    if(enBtn) enBtn.textContent="🎤 영어 녹음 시작";
+    if(koBtn) koBtn.textContent="🎤 한국어 녹음 시작";
   }else if(support){
     support.textContent=SpeechRecognition
       ?"✅ Safari 음성 인식 모드입니다. 최초 사용 시 마이크 권한을 허용하세요."
@@ -2429,8 +2482,8 @@ renderCategories();renderPhrases();
 
   enBtn?.addEventListener("click",()=>listen("en-US",enBox,enBtn,"상대방 영어"));
   koBtn?.addEventListener("click",()=>listen("ko-KR",koBox,koBtn,"내 한국어"));
-  document.addEventListener("visibilitychange",()=>{if(document.hidden)stopRecognition();});
-  window.addEventListener("pagehide",stopRecognition);
+  document.addEventListener("visibilitychange",()=>{if(document.hidden){stopRecognition();activePcmRecorder?.cancel();activePcmRecorder=null;resetButton(activeButton);activeButton=null;}});
+  window.addEventListener("pagehide",()=>{stopRecognition();activePcmRecorder?.cancel();activePcmRecorder=null;});
 
   document.getElementById("copyEnglishBtn")?.addEventListener("click",()=>{
     const t=enBox.textContent.trim();

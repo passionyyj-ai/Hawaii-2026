@@ -1,4 +1,4 @@
-const CACHE_NAME='travelmate-v21-2-pwa-safari-guide';
+const CACHE_NAME='travelmate-v22-mobile-recorder';
 const CORE=['./','./index.html','./config.js','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png','./favicon.ico'];
 
 self.addEventListener('install',event=>{
