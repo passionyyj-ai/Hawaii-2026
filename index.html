@@ -2000,7 +2000,7 @@ function honoluluNow(){
 }
 
 function updateHomeDashboard(){
-  const HAWAII_TZ=getTripSettings().timezone||'Pacific/Honolulu';
+  const HAWAII_TZ=window.getTripSettings?.().timezone||'Pacific/Honolulu';
   const KOREA_TZ='Asia/Seoul';
   const now=new Date();
 
@@ -2243,7 +2243,9 @@ renderCategories();renderPhrases();
   const koBox = document.getElementById("spokenKorean");
   const enBtn = document.getElementById("listenEnglishBtn");
   const koBtn = document.getElementById("listenKoreanBtn");
-  const isStandalone = window.matchMedia?.("(display-mode: standalone)")?.matches || window.navigator.standalone === true;
+  const isStandalone = window.matchMedia?.("(display-mode: standalone)")?.matches
+    || window.navigator.standalone === true
+    || new URLSearchParams(location.search).get("standaloneTest") === "1";
 
   let activeRecognition = null;
   let activeButton = null;
@@ -2290,19 +2292,60 @@ renderCategories();renderPhrases();
   }
   function safariInterpreterUrl(){
     const url=new URL(window.location.href);
+    url.searchParams.delete("standaloneTest");
     url.searchParams.set("safariInterpreter","1");
+    url.searchParams.set("source","pwa");
     url.hash="interpreter";
     return url.toString();
   }
+  function ensureSafariFallback(){
+    let modal=document.getElementById("safariFallbackModal");
+    if(modal) return modal;
+    modal=document.createElement("div");
+    modal.id="safariFallbackModal";
+    modal.className="modal";
+    modal.innerHTML=`<div class="modal-card" style="max-width:520px">
+      <h2 style="margin-top:0">Safari에서 음성 통역 열기</h2>
+      <p style="line-height:1.55">iPhone 홈 화면 앱에서는 브라우저 음성 인식이 시작되지 않을 수 있습니다. 아래 주소를 Safari에서 열면 음성 통역을 사용할 수 있습니다.</p>
+      <input id="safariInterpreterLink" readonly style="width:100%;margin:8px 0 12px">
+      <div style="display:grid;gap:8px">
+        <button class="btn primary" id="shareSafariLink" type="button">공유 메뉴 열기</button>
+        <button class="btn secondary" id="copySafariLink" type="button">주소 복사</button>
+        <button class="btn ghost" id="closeSafariFallback" type="button">닫기</button>
+      </div>
+      <p style="font-size:13px;color:#52666b;margin-bottom:0">공유 메뉴에서 ‘Safari에서 열기’가 보이면 선택하세요. 보이지 않으면 ‘주소 복사’ 후 Safari 주소창에 붙여넣으세요.</p>
+    </div>`;
+    document.body.appendChild(modal);
+    modal.querySelector("#closeSafariFallback").onclick=()=>modal.classList.remove("show");
+    modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("show")});
+    modal.querySelector("#copySafariLink").onclick=async()=>{
+      const url=safariInterpreterUrl();
+      try{await navigator.clipboard.writeText(url);alert("Safari에서 열 주소를 복사했습니다.");}
+      catch(e){prompt("아래 주소를 복사해 Safari에서 열어 주세요.",url);}
+    };
+    modal.querySelector("#shareSafariLink").onclick=async()=>{
+      const url=safariInterpreterUrl();
+      if(navigator.share){
+        try{await navigator.share({title:"TravelMate 음성 통역",url});return;}catch(e){if(e?.name==="AbortError")return;}
+      }
+      try{await navigator.clipboard.writeText(url);alert("공유 메뉴를 열 수 없어 주소를 복사했습니다. Safari 주소창에 붙여넣어 주세요.");}
+      catch(e){prompt("아래 주소를 복사해 Safari에서 열어 주세요.",url);}
+    };
+    return modal;
+  }
   function openSafariInterpreter(){
     stopRecognition();
+    const url=safariInterpreterUrl();
     const a=document.createElement("a");
-    a.href=safariInterpreterUrl();
+    a.href=url;
     a.target="_blank";
     a.rel="noopener noreferrer external";
     document.body.appendChild(a);
     a.click();
     a.remove();
+    const modal=ensureSafariFallback();
+    modal.querySelector("#safariInterpreterLink").value=url;
+    setTimeout(()=>modal.classList.add("show"),350);
   }
 
   async function listen(lang,target,button,who){
@@ -2906,28 +2949,28 @@ renderCategories();renderPhrases();
   function duplicateTrip(id){const trips=loadTrips(),src=trips.find(t=>t.id===id);if(!src)return;trips.unshift({...src,id:uid(),name:src.name+" 복사본"});saveTrips(trips);renderTrips()}
   function deleteTrip(id){const trips=loadTrips(),t=trips.find(x=>x.id===id);if(!t||!confirm(`"${t.name}" 여행을 삭제할까요?`))return;const next=trips.filter(x=>x.id!==id);saveTrips(next);if(activeId()===id)localStorage.setItem(ROOT_KEY+"_active",next[0].id);refreshAll()}
 
-  quickTripSwitcher?.addEventListener("change",e=>setActive(e.target.value));
-  newTripBtn?.addEventListener("click",()=>openEditor());
-  closeTripEditorBtn?.addEventListener("click",closeEditor);
-  cancelTripBtn?.addEventListener("click",closeEditor);
-  saveTripBtn?.addEventListener("click",saveEditor);
+  document.getElementById("quickTripSwitcher")?.addEventListener("change",e=>setActive(e.target.value));
+  document.getElementById("newTripBtn")?.addEventListener("click",()=>openEditor());
+  document.getElementById("closeTripEditorBtn")?.addEventListener("click",closeEditor);
+  document.getElementById("cancelTripBtn")?.addEventListener("click",closeEditor);
+  document.getElementById("saveTripBtn")?.addEventListener("click",saveEditor);
 
-  saveTripSettings?.addEventListener("click",()=>{
+  document.getElementById("saveTripSettings")?.addEventListener("click",()=>{
     const trips=loadTrips(),id=activeId(),i=trips.findIndex(t=>t.id===id);if(i<0)return;
-    trips[i]={...trips[i],name:tripName.value.trim(),city:tripCity.value.trim(),country:tripCountry.value.trim(),timezone:tripTimezone.value.trim(),currency:tripCurrency.value.trim().toUpperCase(),start:tripStart.value,end:tripEnd.value};
+    trips[i]={...trips[i],name:document.getElementById("tripName").value.trim(),city:document.getElementById("tripCity").value.trim(),country:document.getElementById("tripCountry").value.trim(),timezone:document.getElementById("tripTimezone").value.trim(),currency:document.getElementById("tripCurrency").value.trim().toUpperCase(),start:document.getElementById("tripStart").value,end:document.getElementById("tripEnd").value};
     saveTrips(trips);refreshAll();alert("현재 여행 설정을 저장했습니다.");
   });
 
-  saveWalletBtn?.addEventListener("click",saveFields);
-  saveEmergencyBtn?.addEventListener("click",saveFields);
-  addExpenseBtn?.addEventListener("click",()=>{
-    const title=expenseTitle.value.trim(),amount=Number(expenseAmount.value||0),currency=expenseCurrency.value.trim().toUpperCase(),rate=Number(expenseRate.value||0);
+  document.getElementById("saveWalletBtn")?.addEventListener("click",saveFields);
+  document.getElementById("saveEmergencyBtn")?.addEventListener("click",saveFields);
+  document.getElementById("addExpenseBtn")?.addEventListener("click",()=>{
+    const title=document.getElementById("expenseTitle").value.trim(),amount=Number(document.getElementById("expenseAmount").value||0),currency=document.getElementById("expenseCurrency").value.trim().toUpperCase(),rate=Number(document.getElementById("expenseRate").value||0);
     if(!title||!amount)return alert("항목과 금액을 입력하세요.");
     const v=getExpenses();v.unshift({title,amount,currency,krw:amount*rate});setExpenses(v);renderExpenses();
   });
 
   const emergencyData={"United States":{police:"911",ambulance:"911"},"Japan":{police:"110",ambulance:"119"},"France":{police:"17",ambulance:"15 또는 112"},"United Kingdom":{police:"999 또는 112",ambulance:"999 또는 112"}};
-  document.querySelectorAll("[data-emergency]").forEach(b=>b.onclick=()=>{const s=getTripSettings(),d=emergencyData[s.country]||{};emergencyResult.textContent=d[b.dataset.emergency]||`${s.country}의 긴급 정보는 확인이 필요합니다.`});
+  document.querySelectorAll("[data-emergency]").forEach(b=>b.onclick=()=>{const s=getTripSettings(),d=emergencyData[s.country]||{};document.getElementById("emergencyResult").textContent=d[b.dataset.emergency]||`${s.country}의 긴급 정보는 확인이 필요합니다.`});
 
   refreshAll();
 })();
