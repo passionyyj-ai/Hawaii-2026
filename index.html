@@ -2589,8 +2589,8 @@ renderCategories();renderPhrases();
         ...(cfg.supabaseAnonKey ? {"apikey": cfg.supabaseAnonKey, "Authorization": "Bearer " + cfg.supabaseAnonKey} : {})
       },
       body: JSON.stringify({
-        mode: "translate",
-        text: text.trim(),
+          mode: "translate",
+          text: text.trim(),
         source,
         target,
         style: styleSelect?.value || "natural",
