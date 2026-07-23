@@ -7,7 +7,11 @@
 
   const getCfg=()=>{try{return JSON.parse(localStorage.getItem(CFG)||'{}')}catch{return {}}};
   const setCfg=c=>localStorage.setItem(CFG,JSON.stringify(c));
-  const cleanCode=v=>String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);
+  // DB에는 XXXX-XXXX 형식으로 저장되므로 입력/공유 URL도 같은 형식으로 통일한다.
+  const cleanCode=v=>{
+    const raw=String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);
+    return raw.length>4 ? raw.slice(0,4)+'-'+raw.slice(4) : raw;
+  };
   const makeCode=()=>{const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let out='';crypto.getRandomValues(new Uint8Array(8)).forEach(n=>out+=chars[n%chars.length]);return out.slice(0,4)+'-'+out.slice(4,8)};
 
   function cloudDefaults(){
@@ -105,7 +109,7 @@
       if(!c.url||!c.anonKey) return alert('먼저 Supabase 연결정보를 입력하세요.');
       if(code.length<8) return alert('올바른 여행 코드를 입력하세요.');
       const rows=await req(c,'/rest/v1/travelmate_trips?trip_code=eq.'+encodeURIComponent(code)+'&select=trip_code,trip_name');
-      if(!rows?.length) return alert('해당 여행을 찾지 못했습니다.');
+      if(!rows?.length) return alert('여행 코드 '+code+'를 찾지 못했습니다.');
       setCfg({...c,shareCode:rows[0].trip_code,tripName:rows[0].trip_name});
       alert('여행에 참가했습니다. 일정을 불러옵니다.'); location.reload();
     }catch(e){alert('여행 참가 실패: '+e.message)}
@@ -151,7 +155,7 @@
     const code=cleanCode(new URL(location.href).searchParams.get('trip'));
     if(!code)return;
     const c=cloudDefaults();
-    if(c.shareCode!==code) setTimeout(()=>{window.openV20TripCenter();modal().querySelector('#v20JoinCode').value=code},300);
+    if(cleanCode(c.shareCode)!==code) setTimeout(()=>{window.openV20TripCenter();modal().querySelector('#v20JoinCode').value=code},300);
   }
 
   window.openV20TripCenter=()=>{fill();modal().classList.add('show')};

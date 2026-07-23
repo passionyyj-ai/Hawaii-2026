@@ -1,4 +1,4 @@
-const CACHE_NAME='travelmate-v23-1-english-transcript';
+const CACHE_NAME='travelmate-v23-2-trip-code-fix';
 const CORE=['./','./index.html','./config.js','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png','./favicon.ico'];
 
 self.addEventListener('install',event=>{
